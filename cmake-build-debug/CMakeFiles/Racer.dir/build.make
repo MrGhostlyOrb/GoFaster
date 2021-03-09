@@ -129,12 +129,54 @@ CMakeFiles/Racer.dir/Circle.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Racer.dir/Circle.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ben/Desktop/Projects/Racer/Circle.cpp -o CMakeFiles/Racer.dir/Circle.cpp.s
 
+CMakeFiles/Racer.dir/ImageLoading.cpp.o: CMakeFiles/Racer.dir/flags.make
+CMakeFiles/Racer.dir/ImageLoading.cpp.o: ../ImageLoading.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Racer.dir/ImageLoading.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Racer.dir/ImageLoading.cpp.o -c /home/ben/Desktop/Projects/Racer/ImageLoading.cpp
+
+CMakeFiles/Racer.dir/ImageLoading.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Racer.dir/ImageLoading.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ben/Desktop/Projects/Racer/ImageLoading.cpp > CMakeFiles/Racer.dir/ImageLoading.cpp.i
+
+CMakeFiles/Racer.dir/ImageLoading.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Racer.dir/ImageLoading.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ben/Desktop/Projects/Racer/ImageLoading.cpp -o CMakeFiles/Racer.dir/ImageLoading.cpp.s
+
+CMakeFiles/Racer.dir/Sprite.cpp.o: CMakeFiles/Racer.dir/flags.make
+CMakeFiles/Racer.dir/Sprite.cpp.o: ../Sprite.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Racer.dir/Sprite.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Racer.dir/Sprite.cpp.o -c /home/ben/Desktop/Projects/Racer/Sprite.cpp
+
+CMakeFiles/Racer.dir/Sprite.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Racer.dir/Sprite.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ben/Desktop/Projects/Racer/Sprite.cpp > CMakeFiles/Racer.dir/Sprite.cpp.i
+
+CMakeFiles/Racer.dir/Sprite.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Racer.dir/Sprite.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ben/Desktop/Projects/Racer/Sprite.cpp -o CMakeFiles/Racer.dir/Sprite.cpp.s
+
+CMakeFiles/Racer.dir/OBB.cpp.o: CMakeFiles/Racer.dir/flags.make
+CMakeFiles/Racer.dir/OBB.cpp.o: ../OBB.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Racer.dir/OBB.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Racer.dir/OBB.cpp.o -c /home/ben/Desktop/Projects/Racer/OBB.cpp
+
+CMakeFiles/Racer.dir/OBB.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Racer.dir/OBB.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ben/Desktop/Projects/Racer/OBB.cpp > CMakeFiles/Racer.dir/OBB.cpp.i
+
+CMakeFiles/Racer.dir/OBB.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Racer.dir/OBB.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ben/Desktop/Projects/Racer/OBB.cpp -o CMakeFiles/Racer.dir/OBB.cpp.s
+
 # Object files for target Racer
 Racer_OBJECTS = \
 "CMakeFiles/Racer.dir/main.cpp.o" \
 "CMakeFiles/Racer.dir/shaders/Shader.cpp.o" \
 "CMakeFiles/Racer.dir/Square.cpp.o" \
-"CMakeFiles/Racer.dir/Circle.cpp.o"
+"CMakeFiles/Racer.dir/Circle.cpp.o" \
+"CMakeFiles/Racer.dir/ImageLoading.cpp.o" \
+"CMakeFiles/Racer.dir/Sprite.cpp.o" \
+"CMakeFiles/Racer.dir/OBB.cpp.o"
 
 # External object files for target Racer
 Racer_EXTERNAL_OBJECTS =
@@ -143,9 +185,12 @@ Racer: CMakeFiles/Racer.dir/main.cpp.o
 Racer: CMakeFiles/Racer.dir/shaders/Shader.cpp.o
 Racer: CMakeFiles/Racer.dir/Square.cpp.o
 Racer: CMakeFiles/Racer.dir/Circle.cpp.o
+Racer: CMakeFiles/Racer.dir/ImageLoading.cpp.o
+Racer: CMakeFiles/Racer.dir/Sprite.cpp.o
+Racer: CMakeFiles/Racer.dir/OBB.cpp.o
 Racer: CMakeFiles/Racer.dir/build.make
 Racer: CMakeFiles/Racer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Racer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable Racer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Racer.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

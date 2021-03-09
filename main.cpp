@@ -9,10 +9,11 @@ using namespace std;
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "GL/freeglut.h"
 #include "shaders/Shader.h"
-#include "Square.h"
-#include "Circle.h"
+#include "GL/freeglut.h"
+#include "FreeImage.h"
+
+#include "Sprite.h"
 
 #include <iostream>
 using namespace std;
@@ -21,26 +22,16 @@ glm::mat4 ViewMatrix;  // matrix for the modelling and viewing
 glm::mat4 ProjectionMatrix; // matrix for the orthographic projection
 int screenWidth = 480, screenHeight = 480;
 
-Square myRedSquare, myGreenSquare;
-Shader myShader;
-
-
-//Variables for the positions of the squares
-float XRedSquare = 0;
-float YRedSquare = 0;
-float XGreenSquare = 5;
-float YGreenSquare = 0;
-
 //booleans to handle when the arrow keys are pressed or released.
 bool Left = false;
 bool Right = false;
 bool Up = false;
 bool Down = false;
 
-float Angle = 0.0f;
+Shader shader;
+Sprite mySquare;
 
-#define PI 3.1415926535897932384626433832795
-const double ToRadians = PI / 180.0;
+float Angle = 0.5f;
 
 //OPENGL FUNCTION PROTOTYPES
 void display();				//used as callback in glut for display.
@@ -56,51 +47,49 @@ void reshape(int width, int height)		// Resize the OpenGL window
 
     glViewport(0, 0, width, height);						// set Viewport dimensions
 
-    ProjectionMatrix = glm::ortho(-15.0, 15.0, -15.0, 15.0);
+    ProjectionMatrix = glm::ortho(-25.0, 25.0, -25.0, 25.0);
 }
 
 
 void display()
 {
-    //clear the colour buffer
+    //clear the colour and depth buffers
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //set the view matrix
     ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
 
-    //set the modelviewmatrix for the green square
-    glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(XGreenSquare, YGreenSquare, 0.0));
+    glEnable(GL_BLEND);
+    glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(mySquare.GetXPos(), mySquare.GetYPos(), 0.0));
 
-    myGreenSquare.Render(myShader, ModelViewMatrix, ProjectionMatrix);
+    ModelViewMatrix = glm::rotate(ModelViewMatrix, Angle, glm::vec3(0.0, 0.0, 1.0));
 
-    //Set the modelviewtransform for the red square.
-    glm::mat4 redTransform = glm::translate(ViewMatrix, glm::vec3(XRedSquare, YRedSquare, 0.0));
-    myRedSquare.Render(myShader, redTransform, ProjectionMatrix);
+    mySquare.Render(shader, ModelViewMatrix, ProjectionMatrix);
+    glDisable(GL_BLEND);
 
     glutSwapBuffers();
 
-    Angle += 0.0005f;
-    if (Angle >= 360)
-        Angle = 0;
 }
 
 void init()
 {
-    glClearColor(1.0,1.0,1.0,0.0);						//sets the clear colour to black
+    FreeImage_Initialise();
 
-    if (!myShader.load("Basic", "./glslfiles/basicTransformations.vert", "./glslfiles/basicTransformations.frag"))
+    glClearColor(0.0,0.0,1.0,0.0);						//sets the clear colour to black
+
+    //Load the GLSL program
+    if (!shader.load("Basic", "./glslfiles/basicTexture.vert", "./glslfiles/basicTexture.frag"))
     {
         std::cout << "failed to load shader" << std::endl;
     }
 
-    myRedSquare.SetSideSize(4.0f);
+    ///This part commented is to scale the width of the sprite to match the dimensions of the car.png image.
+    mySquare.SetWidth(10.0f *(500 / 264.0f));
+    mySquare.SetHeight(10.0f);
     float red[3] = { 1,0,0 };
-    myRedSquare.Init(myShader, red);
 
-    myGreenSquare.SetSideSize(3.0f);
-    float green[3] = { 0,1,0 };
-    myGreenSquare.Init(myShader, green);
+    mySquare.Init(shader, red, "car.png");
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void special(int key, int x, int y)
@@ -145,19 +134,19 @@ void processKeys()
 {
     if (Left)
     {
-        XRedSquare -= 0.1f;
+        mySquare.IncPos(-0.1f, 0.0f);
     }
     if (Right)
     {
-        XRedSquare += 0.1f;
+        mySquare.IncPos(0.1f, 0.0f);
     }
     if (Up)
     {
-        YRedSquare += 0.1f;
+        mySquare.IncPos(0.0f, 0.1f);
     }
     if (Down)
     {
-        YRedSquare -= 0.1f;
+        mySquare.IncPos(0.0f, -0.1f);
     }
 }
 
@@ -177,7 +166,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(screenWidth, screenHeight);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("OpenGL FreeGLUT Example: Square");
+    glutCreateWindow("OpenGL FreeGLUT Example: Image loading");
 
     glutReshapeFunc(reshape);
 
@@ -200,9 +189,9 @@ int main(int argc, char **argv)
     //specify which function will be called to refresh the screen.
     glutDisplayFunc(display);
 
-
     glutSpecialFunc(special);
     glutSpecialUpFunc(specialUp);
+
     glutIdleFunc(idle);
 
     //starts the main loop. Program loops and calls callback functions as appropriate.

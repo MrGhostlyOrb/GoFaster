@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/Racer.dir/main.cpp.o CMakeFiles/Racer.dir/shaders/Shader.cpp.o CMakeFiles/Racer.dir/Square.cpp.o CMakeFiles/Racer.dir/Circle.cpp.o  -o Racer  -lglut -lGLU -lGL -lGLEW 
+/usr/bin/c++  -g   CMakeFiles/Racer.dir/main.cpp.o CMakeFiles/Racer.dir/shaders/Shader.cpp.o CMakeFiles/Racer.dir/Square.cpp.o CMakeFiles/Racer.dir/Circle.cpp.o CMakeFiles/Racer.dir/ImageLoading.cpp.o CMakeFiles/Racer.dir/Sprite.cpp.o CMakeFiles/Racer.dir/OBB.cpp.o  -o Racer  -lglut -lGLU -lGL -lGLEW -lfreeimage 

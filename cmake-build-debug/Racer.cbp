@@ -88,16 +88,28 @@
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Circle.h">
 			<Option target="Racer"/>
 		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/ImageLoading.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/ImageLoading.h">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/OBB.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/OBB.h">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Sprite.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Sprite.h">
+			<Option target="Racer"/>
+		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Square.cpp">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Square.h">
-			<Option target="Racer"/>
-		</Unit>
-		<Unit filename="/home/ben/Desktop/Projects/Racer/cmake-build-debug/shaders/Shader.cpp">
-			<Option target="Racer"/>
-		</Unit>
-		<Unit filename="/home/ben/Desktop/Projects/Racer/cmake-build-debug/shaders/Shader.h">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/main.cpp">

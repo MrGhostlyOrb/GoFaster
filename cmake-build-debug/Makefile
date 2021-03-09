@@ -170,6 +170,87 @@ Circle.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Circle.cpp.s
 .PHONY : Circle.cpp.s
 
+ImageLoading.o: ImageLoading.cpp.o
+
+.PHONY : ImageLoading.o
+
+# target to build an object file
+ImageLoading.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/ImageLoading.cpp.o
+.PHONY : ImageLoading.cpp.o
+
+ImageLoading.i: ImageLoading.cpp.i
+
+.PHONY : ImageLoading.i
+
+# target to preprocess a source file
+ImageLoading.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/ImageLoading.cpp.i
+.PHONY : ImageLoading.cpp.i
+
+ImageLoading.s: ImageLoading.cpp.s
+
+.PHONY : ImageLoading.s
+
+# target to generate assembly for a file
+ImageLoading.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/ImageLoading.cpp.s
+.PHONY : ImageLoading.cpp.s
+
+OBB.o: OBB.cpp.o
+
+.PHONY : OBB.o
+
+# target to build an object file
+OBB.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/OBB.cpp.o
+.PHONY : OBB.cpp.o
+
+OBB.i: OBB.cpp.i
+
+.PHONY : OBB.i
+
+# target to preprocess a source file
+OBB.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/OBB.cpp.i
+.PHONY : OBB.cpp.i
+
+OBB.s: OBB.cpp.s
+
+.PHONY : OBB.s
+
+# target to generate assembly for a file
+OBB.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/OBB.cpp.s
+.PHONY : OBB.cpp.s
+
+Sprite.o: Sprite.cpp.o
+
+.PHONY : Sprite.o
+
+# target to build an object file
+Sprite.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.o
+.PHONY : Sprite.cpp.o
+
+Sprite.i: Sprite.cpp.i
+
+.PHONY : Sprite.i
+
+# target to preprocess a source file
+Sprite.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.i
+.PHONY : Sprite.cpp.i
+
+Sprite.s: Sprite.cpp.s
+
+.PHONY : Sprite.s
+
+# target to generate assembly for a file
+Sprite.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.s
+.PHONY : Sprite.cpp.s
+
 Square.o: Square.cpp.o
 
 .PHONY : Square.o
@@ -231,7 +312,6 @@ shaders/Shader.o: shaders/Shader.cpp.o
 # target to build an object file
 shaders/Shader.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.o
 .PHONY : shaders/Shader.cpp.o
 
 shaders/Shader.i: shaders/Shader.cpp.i
@@ -241,7 +321,6 @@ shaders/Shader.i: shaders/Shader.cpp.i
 # target to preprocess a source file
 shaders/Shader.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.i
 .PHONY : shaders/Shader.cpp.i
 
 shaders/Shader.s: shaders/Shader.cpp.s
@@ -250,7 +329,6 @@ shaders/Shader.s: shaders/Shader.cpp.s
 
 # target to generate assembly for a file
 shaders/Shader.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/shaders/Shader.cpp.s
 .PHONY : shaders/Shader.cpp.s
 
@@ -266,6 +344,15 @@ help:
 	@echo "... Circle.o"
 	@echo "... Circle.i"
 	@echo "... Circle.s"
+	@echo "... ImageLoading.o"
+	@echo "... ImageLoading.i"
+	@echo "... ImageLoading.s"
+	@echo "... OBB.o"
+	@echo "... OBB.i"
+	@echo "... OBB.s"
+	@echo "... Sprite.o"
+	@echo "... Sprite.i"
+	@echo "... Sprite.s"
 	@echo "... Square.o"
 	@echo "... Square.i"
 	@echo "... Square.s"
