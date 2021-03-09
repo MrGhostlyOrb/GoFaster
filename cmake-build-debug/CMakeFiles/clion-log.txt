@@ -1,0 +1,5 @@
+/snap/clion/139/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/ben/Desktop/Projects/Racer
+-- Configuring done
+Warning: Source file "/home/ben/Desktop/Projects/Racer/cmake-build-debug/shaders/Shader.cpp" is listed multiple times for target "Racer".
+-- Generating done
+-- Build files have been written to: /home/ben/Desktop/Projects/Racer/cmake-build-debug
