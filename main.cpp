@@ -54,62 +54,85 @@ void reshape(int width, int height)		// Resize the OpenGL window
 
     glViewport(0, 0, width, height);						// set Viewport dimensions
 
+    //Set default coordinate system
     ProjectionMatrix = glm::ortho(-25.0, 25.0, -25.0, 25.0);
 }
 
 
 void display()
 {
-    //clear the colour and depth buffers
+    //Clear the colour and depth buffers
     glClear(GL_COLOR_BUFFER_BIT);
 
-    ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
-    glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(car.GetXPos(), car.GetYPos(), 0.0));
-
-
+    //Enable blend before rendering
     glEnable(GL_BLEND);
 
+    //Create a ViewMatrix with the identity matrix
+    ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
+
+    //Create a CarModelViewMatrix to transform the car to the correct x,y
+    glm::mat4 CarModelViewMatrix = ViewMatrix;
+    CarModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(car.GetXPos(), car.GetYPos(), 0.0));
+
+    //Set default track position to 0
     float trackPosition = 0;
 
+    //Render a sequence of track
     for(int i = 0; i < 20; i++){
-        glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0.0, trackPosition, 0.0));
-        trackUp.Render(shader, ModelViewMatrix, ProjectionMatrix);
+
+        //Create a TrackModelViewMatrix to position the track on an increasing x,y
+        glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0.0, trackPosition, 0.0));
+
+        //Render the track pieces
+        trackUp.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+
+        //Increase track position
         trackPosition += 5;
     }
 
+    //If the player is moving up, scroll the axis
     if(Up){
         orthoYmin += 0.11;
         orthoYmax += 0.11;
         ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
     }
+
+    //If the player is moving down, scroll the axis
     if (Down) {
         orthoYmin -= 0.09;
         orthoYmax -= 0.09;
         ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
+
+        //180 degree angle
         float roteAngle = 1.57*2;
-        ModelViewMatrix = glm::rotate(ModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
 
-
+        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
+        CarModelViewMatrix = glm::rotate(CarModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
     }
+
+    //If the player is moving left, rotate player
     if (Left) {
+
+        //90 degree angle
         float roteAngle = 1.57;
-        ModelViewMatrix = glm::rotate(ModelViewMatrix,roteAngle,glm::vec3(0.0, 0.0, 1.0));
+
+        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
+        CarModelViewMatrix = glm::rotate(CarModelViewMatrix,roteAngle,glm::vec3(0.0, 0.0, 1.0));
     }
 
-
+    //If the player is moving right, rotate player
     if (Right) {
+
+        //90 degree angle
         float roteAngle = -1.57;
-        ModelViewMatrix = glm::rotate(ModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
+
+        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
+        CarModelViewMatrix = glm::rotate(CarModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
     }
 
+    glm::mat4 CarViewMatrix = glm::rotate(CarViewMatrix, car.getRot(), glm::vec3(0.0, 0.0, 1.0));
 
-
-
-
-
-    ModelViewMatrix = glm::rotate(ModelViewMatrix, car.getRot(), glm::vec3(0.0, 0.0, 1.0));
-
-    car.Render(shader, ModelViewMatrix, ProjectionMatrix);
+    car.Render(shader, CarModelViewMatrix, ProjectionMatrix);
     glDisable(GL_BLEND);
 
     glutSwapBuffers();
@@ -208,11 +231,11 @@ void processKeys()
     }
     if (Up)
     {
-        car.IncPos(0.0f, 0.1f);
+        car.IncPos(0.0f, 0.2f);
     }
     if (Down)
     {
-        car.IncPos(0.0f, -0.1f);
+        car.IncPos(0.0f, -0.2f);
     }
 }
 
@@ -232,7 +255,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(screenWidth, screenHeight);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("OpenGL FreeGLUT Example: Image loading");
+    glutCreateWindow("Racer");
 
     glutReshapeFunc(reshape);
 
