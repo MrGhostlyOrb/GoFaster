@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/home/ben/Desktop/Projects/Racer/Car.h
+string
+-
+glm/glm.hpp
+/home/ben/Desktop/Projects/Racer/glm/glm.hpp
+glm/gtc/matrix_transform.hpp
+/home/ben/Desktop/Projects/Racer/glm/gtc/matrix_transform.hpp
+GL/glew.h
+/home/ben/Desktop/Projects/Racer/GL/glew.h
+shaders/Shader.h
+/home/ben/Desktop/Projects/Racer/shaders/Shader.h
+OBB.h
+/home/ben/Desktop/Projects/Racer/OBB.h
+
 /home/ben/Desktop/Projects/Racer/FreeImage.h
 wchar.h
 -
@@ -64,19 +78,15 @@ glm/glm.hpp
 glm/gtc/matrix_transform.hpp
 /home/ben/Desktop/Projects/Racer/glm/gtc/matrix_transform.hpp
 
-/home/ben/Desktop/Projects/Racer/Sprite.h
-string
--
+/home/ben/Desktop/Projects/Racer/Square.h
+shaders/Shader.h
+/home/ben/Desktop/Projects/Racer/shaders/Shader.h
 glm/glm.hpp
 /home/ben/Desktop/Projects/Racer/glm/glm.hpp
 glm/gtc/matrix_transform.hpp
 /home/ben/Desktop/Projects/Racer/glm/gtc/matrix_transform.hpp
-GL/glew.h
-/home/ben/Desktop/Projects/Racer/GL/glew.h
-shaders/Shader.h
-/home/ben/Desktop/Projects/Racer/shaders/Shader.h
-OBB.h
-/home/ben/Desktop/Projects/Racer/OBB.h
+string
+-
 
 /home/ben/Desktop/Projects/Racer/glm/common.hpp
 detail/qualifier.hpp
@@ -1183,8 +1193,10 @@ GL/freeglut.h
 /home/ben/Desktop/Projects/Racer/GL/freeglut.h
 FreeImage.h
 /home/ben/Desktop/Projects/Racer/FreeImage.h
-Sprite.h
-/home/ben/Desktop/Projects/Racer/Sprite.h
+Car.h
+/home/ben/Desktop/Projects/Racer/Car.h
+Square.h
+/home/ben/Desktop/Projects/Racer/Square.h
 iostream
 -
 

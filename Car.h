@@ -8,7 +8,7 @@
 #include "shaders/Shader.h"
 #include "OBB.h"
 
-class Sprite
+class Car
 {
 private:
 	unsigned int m_vaoID;		// id for Vertex Array Object
@@ -22,13 +22,14 @@ private:
 	//position of the sprite
 	float m_xpos;
 	float m_ypos;
+	float m_rot;
 
 	GLuint m_TexName; //identifier for the texture
 
 	OBB obb; //obb object for oriented bounding box collision
 
 public:
-	Sprite();					//default constructor
+	Car();					//default constructor
 	void Init(Shader& shader, float colour[3], std::string filename);
 	void SetWidth(float size);
 	void SetHeight(float size);
@@ -40,4 +41,10 @@ public:
 	void Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix);
 	OBB& GetOBB();
 	bool IsInCollision(OBB &anotherOBB);
+
+    void incRot(float rot);
+
+    void decRot(float rot);
+
+    float getRot();
 };

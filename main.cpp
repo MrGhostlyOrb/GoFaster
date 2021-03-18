@@ -13,7 +13,8 @@ using namespace std;
 #include "GL/freeglut.h"
 #include "FreeImage.h"
 
-#include "Sprite.h"
+#include "Car.h"
+#include "Square.h"
 
 #include <iostream>
 using namespace std;
@@ -28,8 +29,14 @@ bool Right = false;
 bool Up = false;
 bool Down = false;
 
+double orthoYmax = 25;
+double orthoYmin = -25;
+double orthoXmin = -25;
+double orthoXmax = 25;
+
 Shader shader;
-Sprite mySquare;
+Car car;
+Square trackUp;
 
 float Angle = 0.5f;
 
@@ -57,13 +64,52 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT);
 
     ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
+    glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(car.GetXPos(), car.GetYPos(), 0.0));
+
 
     glEnable(GL_BLEND);
-    glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(mySquare.GetXPos(), mySquare.GetYPos(), 0.0));
 
-    ModelViewMatrix = glm::rotate(ModelViewMatrix, Angle, glm::vec3(0.0, 0.0, 1.0));
+    float trackPosition = 0;
 
-    mySquare.Render(shader, ModelViewMatrix, ProjectionMatrix);
+    for(int i = 0; i < 20; i++){
+        glm::mat4 ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0.0, trackPosition, 0.0));
+        trackUp.Render(shader, ModelViewMatrix, ProjectionMatrix);
+        trackPosition += 5;
+    }
+
+    if(Up){
+        orthoYmin += 0.11;
+        orthoYmax += 0.11;
+        ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
+    }
+    if (Down) {
+        orthoYmin -= 0.09;
+        orthoYmax -= 0.09;
+        ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
+        float roteAngle = 1.57*2;
+        ModelViewMatrix = glm::rotate(ModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
+
+
+    }
+    if (Left) {
+        float roteAngle = 1.57;
+        ModelViewMatrix = glm::rotate(ModelViewMatrix,roteAngle,glm::vec3(0.0, 0.0, 1.0));
+    }
+
+
+    if (Right) {
+        float roteAngle = -1.57;
+        ModelViewMatrix = glm::rotate(ModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
+    }
+
+
+
+
+
+
+    ModelViewMatrix = glm::rotate(ModelViewMatrix, car.getRot(), glm::vec3(0.0, 0.0, 1.0));
+
+    car.Render(shader, ModelViewMatrix, ProjectionMatrix);
     glDisable(GL_BLEND);
 
     glutSwapBuffers();
@@ -74,7 +120,7 @@ void init()
 {
     FreeImage_Initialise();
 
-    glClearColor(0.0,0.0,1.0,0.0);						//sets the clear colour to black
+    glClearColor(0.0,0.0,0.0,0.0);						//sets the clear colour to black
 
     //Load the GLSL program
     if (!shader.load("Basic", "./glslfiles/basicTexture.vert", "./glslfiles/basicTexture.frag"))
@@ -83,11 +129,16 @@ void init()
     }
 
     ///This part commented is to scale the width of the sprite to match the dimensions of the car.png image.
-    mySquare.SetWidth(10.0f *(500 / 264.0f));
-    mySquare.SetHeight(10.0f);
+    car.SetWidth(5.0f);
+    car.SetHeight(10.0f);
+    trackUp.SetWidth(10.0f * (500 / 264.0f));
+    trackUp.SetHeight(10.0f);
     float red[3] = { 1,0,0 };
+    float blue[3] = { 0,0,1 };
 
-    mySquare.Init(shader, red, "car.png");
+    car.Init(shader, red, "car.png");
+    trackUp.Init(shader, blue, "roadTexture_84.png");
+
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -98,6 +149,7 @@ void special(int key, int x, int y)
     {
         case GLUT_KEY_LEFT:
             Left = true;
+            Angle += 0.5;
             break;
         case GLUT_KEY_RIGHT:
             Right = true;
@@ -134,19 +186,33 @@ void processKeys()
 {
     if (Left)
     {
-        mySquare.IncPos(-0.1f, 0.0f);
+        if(car.getRot() <= -3){
+            car.incRot(0.01);
+        }
+        else{
+            car.decRot(0.01);
+        }
+        std::cout << car.getRot() << std::endl;
+
     }
     if (Right)
     {
-        mySquare.IncPos(0.1f, 0.0f);
+        if(car.getRot() <= -3){
+            car.decRot(0.01);
+        }
+        else{
+            car.incRot(0.01);
+        }
+        std::cout << car.getRot() << std::endl;
+
     }
     if (Up)
     {
-        mySquare.IncPos(0.0f, 0.1f);
+        car.IncPos(0.0f, 0.1f);
     }
     if (Down)
     {
-        mySquare.IncPos(0.0f, -0.1f);
+        car.IncPos(0.0f, -0.1f);
     }
 }
 

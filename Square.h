@@ -17,6 +17,8 @@ private:
 	float m_SideSize;
     GLuint m_TexName; //identifier for the texture
     unsigned int m_NumberOfVerts;//number of vertices in the object
+    float m_XPos;
+    float m_Ypos;
 
 public:
 	Square();					//default constructor
@@ -25,4 +27,8 @@ public:
 	void Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix);
     void SetWidth(float size);
     void SetHeight(float size);
+    void SetXPos(float XPos);
+    void SetYPos(float YPos);
+    float GetXPos();
+    float GetYPos();
 };

@@ -1,4 +1,4 @@
-#include "Sprite.h"
+#include "Car.h"
 #include "shaders/Shader.h"
 #include <string>
 #include "ImageLoading.h"
@@ -9,7 +9,7 @@
 
 
 
-Sprite::Sprite()
+Car::Car()
 {
 	m_vaoID = 0;
 	m_vboID[0] = 0;
@@ -19,41 +19,42 @@ Sprite::Sprite()
 	m_NumberOfVerts = 0;
 	m_xpos = 0;
 	m_ypos = 0;
+    m_rot = 0;
 }
 
-void Sprite::SetWidth(float size)
+void Car::SetWidth(float size)
 {
 	m_Width = size;
 }
 
-void Sprite::SetHeight(float size)
+void Car::SetHeight(float size)
 {
 	m_Height = size;
 }
 
-void Sprite::SetXpos(float x)
+void Car::SetXpos(float x)
 {
 	m_xpos = x;
 }
-void Sprite::SetYpos(float y)
+void Car::SetYpos(float y)
 {
 	m_ypos = y;
 }
-float Sprite::GetXPos()
+float Car::GetXPos()
 {
 	return m_xpos;
 }
-float Sprite::GetYPos()
+float Car::GetYPos()
 {
 	return m_ypos;
 }
 
-void Sprite::IncPos(float x, float y)
+void Car::IncPos(float x, float y)
 {
 	m_xpos += x;
 	m_ypos += y;
 }
-void Sprite::Init(Shader& shader, float colour[3], std::string filename)
+void Car::Init(Shader& shader, float colour[3], std::string filename)
 {
 	//load png image
 	int imageHeight = 0;
@@ -178,7 +179,7 @@ void Sprite::Init(Shader& shader, float colour[3], std::string filename)
 	glBindVertexArray(0);
 }
 
-void Sprite::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix)
+void Car::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix)
 {
 	/****UPDATE THE CORNER VALUES BASED ON TRANSFORMATION***/
 	obb.transformPoints(ModelViewMatrix);
@@ -205,16 +206,28 @@ void Sprite::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& Proje
 	glUseProgram(0); //turn off the current shader
 }
 
-OBB& Sprite::GetOBB()
+OBB& Car::GetOBB()
 {
 	return obb;
 }
 
-bool Sprite::IsInCollision(OBB &anotherOBB)
+bool Car::IsInCollision(OBB &anotherOBB)
 {
 	if (obb.SAT2D(anotherOBB))
 	{
 		return true;
 	}
 	return false;
+}
+
+void Car::incRot(float rot) {
+    this->m_rot += rot;
+}
+
+void Car::decRot(float rot) {
+    this->m_rot -= rot;
+}
+
+float Car::getRot() {
+    return this->m_rot;
 }

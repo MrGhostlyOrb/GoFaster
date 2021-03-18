@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/ben/Desktop/Projects/Racer/Car.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/Car.cpp.o"
   "/home/ben/Desktop/Projects/Racer/Circle.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/Circle.cpp.o"
   "/home/ben/Desktop/Projects/Racer/ImageLoading.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/ImageLoading.cpp.o"
   "/home/ben/Desktop/Projects/Racer/OBB.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/OBB.cpp.o"
-  "/home/ben/Desktop/Projects/Racer/Sprite.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/Sprite.cpp.o"
   "/home/ben/Desktop/Projects/Racer/Square.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/Square.cpp.o"
   "/home/ben/Desktop/Projects/Racer/main.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/main.cpp.o"
   "/home/ben/Desktop/Projects/Racer/shaders/Shader.cpp" "/home/ben/Desktop/Projects/Racer/cmake-build-debug/CMakeFiles/Racer.dir/shaders/Shader.cpp.o"

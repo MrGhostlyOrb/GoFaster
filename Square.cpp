@@ -15,6 +15,8 @@ Square::Square()
 	m_SideSize = 0.0f;
 	m_Width = 0.0f;
 	m_Height = 0.0f;
+	m_XPos = 0.0f;
+	m_Ypos = 0.0f;
 }
 
 void Square::SetWidth(float size)
@@ -160,4 +162,20 @@ void Square::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& Proje
 
 	glBindVertexArray(0); //unbind the vertex array object
 	glUseProgram(0); //turn off the current shader
+}
+
+void Square::SetXPos(float XPos) {
+    this->m_XPos = XPos;
+}
+
+void Square::SetYPos(float YPos) {
+    this->m_Ypos = YPos;
+}
+
+float Square::GetXPos() {
+    return this->m_XPos;
+}
+
+float Square::GetYPos() {
+    return this->m_Ypos;
 }

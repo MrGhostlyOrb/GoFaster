@@ -59,10 +59,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /var/lib/snapd/snap/clion/139/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /var/lib/snapd/snap/clion/145/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /var/lib/snapd/snap/clion/139/bin/cmake/linux/bin/cmake -E rm -f
+RM = /var/lib/snapd/snap/clion/145/bin/cmake/linux/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -79,7 +79,7 @@ CMAKE_BINARY_DIR = /home/ben/Desktop/Projects/Racer/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/var/lib/snapd/snap/clion/139/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/var/lib/snapd/snap/clion/145/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -90,7 +90,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/var/lib/snapd/snap/clion/139/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/var/lib/snapd/snap/clion/145/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -142,6 +142,33 @@ Racer: cmake_check_build_system
 Racer/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/build
 .PHONY : Racer/fast
+
+Car.o: Car.cpp.o
+
+.PHONY : Car.o
+
+# target to build an object file
+Car.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Car.cpp.o
+.PHONY : Car.cpp.o
+
+Car.i: Car.cpp.i
+
+.PHONY : Car.i
+
+# target to preprocess a source file
+Car.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Car.cpp.i
+.PHONY : Car.cpp.i
+
+Car.s: Car.cpp.s
+
+.PHONY : Car.s
+
+# target to generate assembly for a file
+Car.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Car.cpp.s
+.PHONY : Car.cpp.s
 
 Circle.o: Circle.cpp.o
 
@@ -223,33 +250,6 @@ OBB.s: OBB.cpp.s
 OBB.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/OBB.cpp.s
 .PHONY : OBB.cpp.s
-
-Sprite.o: Sprite.cpp.o
-
-.PHONY : Sprite.o
-
-# target to build an object file
-Sprite.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.o
-.PHONY : Sprite.cpp.o
-
-Sprite.i: Sprite.cpp.i
-
-.PHONY : Sprite.i
-
-# target to preprocess a source file
-Sprite.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.i
-.PHONY : Sprite.cpp.i
-
-Sprite.s: Sprite.cpp.s
-
-.PHONY : Sprite.s
-
-# target to generate assembly for a file
-Sprite.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Racer.dir/build.make CMakeFiles/Racer.dir/Sprite.cpp.s
-.PHONY : Sprite.cpp.s
 
 Square.o: Square.cpp.o
 
@@ -341,6 +341,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Racer"
+	@echo "... Car.o"
+	@echo "... Car.i"
+	@echo "... Car.s"
 	@echo "... Circle.o"
 	@echo "... Circle.i"
 	@echo "... Circle.s"
@@ -350,9 +353,6 @@ help:
 	@echo "... OBB.o"
 	@echo "... OBB.i"
 	@echo "... OBB.s"
-	@echo "... Sprite.o"
-	@echo "... Sprite.i"
-	@echo "... Sprite.s"
 	@echo "... Square.o"
 	@echo "... Square.i"
 	@echo "... Square.s"

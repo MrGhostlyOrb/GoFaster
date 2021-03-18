@@ -82,6 +82,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Car.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Car.h">
+			<Option target="Racer"/>
+		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Circle.cpp">
 			<Option target="Racer"/>
 		</Unit>
@@ -98,12 +104,6 @@
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/OBB.h">
-			<Option target="Racer"/>
-		</Unit>
-		<Unit filename="/home/ben/Desktop/Projects/Racer/Sprite.cpp">
-			<Option target="Racer"/>
-		</Unit>
-		<Unit filename="/home/ben/Desktop/Projects/Racer/Sprite.h">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Square.cpp">
