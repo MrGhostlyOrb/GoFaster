@@ -19,6 +19,7 @@ using namespace std;
 
 #include "Car.h"
 #include "Square.h"
+#include "FreeType.h"
 
 #include <iostream>
 
@@ -43,6 +44,8 @@ Shader shader;
 Car car;
 Square trackUp;
 Square trackRight;
+
+freetype::Font font;
 
 float currentAngle = 0;
 float targetAngle = 0;
@@ -113,6 +116,9 @@ void display()
     std::cout << "Target Angle : " << targetAngle << std::endl;
 
     car.Render(shader, CarModelViewMatrix, ProjectionMatrix);
+
+    print(ProjectionMatrix, font, 0, 0, "Text");
+
     glDisable(GL_BLEND);
 
     glutSwapBuffers();
@@ -124,7 +130,7 @@ void init()
 
     FreeImage_Initialise();
 
-    glClearColor(0.0,0.0,0.0,0.0);						//sets the clear colour to black
+    glClearColor(1.0,0.0,0.0,0.0);						//sets the clear colour to black
 
     //Load the GLSL program
     if (!shader.load("Basic", "./glslfiles/basicTexture.vert", "./glslfiles/basicTexture.frag"))
@@ -145,6 +151,11 @@ void init()
     car.Init(shader, red, "car.png");
     trackUp.Init(shader, blue, "roadTexture_84.png");
     trackRight.Init(shader, blue, "roadTexture_84.png");
+
+    font.init("fonts/Product Sans Regular.ttf", 22);
+
+
+
 
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -227,8 +238,6 @@ void processKeys()
     if (Up)
     {
 
-
-
         float normalAngle;
         if(currentAngle > 2*M_PI || currentAngle < 2*M_PI){
             normalAngle = remainder(currentAngle, 2*M_PI);
@@ -237,6 +246,7 @@ void processKeys()
             normalAngle = currentAngle;
         }
 
+        std::cout << normalAngle << std::endl;
 
         //  Bottom Left -
         //.
