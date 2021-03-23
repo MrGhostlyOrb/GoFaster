@@ -12,11 +12,16 @@ using namespace std;
 #include "shaders/Shader.h"
 #include "GL/freeglut.h"
 #include "FreeImage.h"
+#include <cmath>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #include "Car.h"
 #include "Square.h"
 
 #include <iostream>
+
 using namespace std;
 
 glm::mat4 ViewMatrix;  // matrix for the modelling and viewing
@@ -37,6 +42,7 @@ double orthoXmax = 25;
 Shader shader;
 Car car;
 Square trackUp;
+Square trackRight;
 
 float currentAngle = 0;
 float targetAngle = 0;
@@ -77,10 +83,9 @@ void display()
 
     //Set default track position to 0
     float trackPosition = 0;
-    float roteAngle = 0;
 
 
-    //Render a sequence of track
+    //Render a sequence of track going up
     for(int i = 0; i < 20; i++){
 
         //Create a TrackModelViewMatrix to position the track on an increasing x,y
@@ -90,60 +95,16 @@ void display()
         trackUp.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
 
         //Increase track position
-        trackPosition += 5;
+        trackPosition += 10;
     }
 
-    //If the player is moving up, scroll the axis
-    if(Up){
-        orthoYmin += 0.11;
-        orthoYmax += 0.11;
-        ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
-    }
+    trackPosition = 0;
+    for(int i = 0; i < 20; i++){
+        glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 0.0, 0.0));
 
-    //If the player is moving down, scroll the axis
-    if (Down) {
-        orthoYmin -= 0.09;
-        orthoYmax -= 0.09;
-        ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
+        trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
 
-        //180 degree angle
-        roteAngle = 1.57*2;
-
-        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-    }
-
-    //If the player is moving left, rotate player
-    if (Left) {
-
-        //90 degree angle
-        if(currentAngle >= targetAngle){
-            std::cout << "Current Angle is less than target angle" << std::endl;
-            currentAngle += 0.01;
-        }
-        else {
-            std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle += 0.1;
-        }
-
-        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-
-    }
-
-    //If the player is moving right, rotate player
-    if (Right) {
-
-        //90 degree angle
-        if(currentAngle >= targetAngle){
-            currentAngle -= 0.01;
-            std::cout << "Current Angle is less than target angle" << std::endl;
-        }
-        else {
-            std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle -= 0.1;
-        }
-
-        //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-
+        trackPosition += 10;
     }
 
     CarModelViewMatrix = glm::rotate(CarModelViewMatrix, currentAngle, glm::vec3(0.0, 0.0, 1.0));
@@ -160,6 +121,7 @@ void display()
 
 void init()
 {
+
     FreeImage_Initialise();
 
     glClearColor(0.0,0.0,0.0,0.0);						//sets the clear colour to black
@@ -175,11 +137,14 @@ void init()
     car.SetHeight(10.0f);
     trackUp.SetWidth(10.0f * (500 / 264.0f));
     trackUp.SetHeight(10.0f);
+    trackRight.SetWidth(10.0f * (500 / 264.0f));
+    trackRight.SetHeight(10.0f);
     float red[3] = { 1,0,0 };
     float blue[3] = { 0,0,1 };
 
     car.Init(shader, red, "car.png");
     trackUp.Init(shader, blue, "roadTexture_84.png");
+    trackRight.Init(shader, blue, "roadTexture_84.png");
 
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -201,6 +166,10 @@ void special(int key, int x, int y)
         case GLUT_KEY_DOWN:
             Down = true;
             break;
+        case GLUT_KEY_DELETE:
+            glutLeaveMainLoop();
+        default:
+            break;
     }
 }
 
@@ -220,6 +189,8 @@ void specialUp(int key, int x, int y)
         case GLUT_KEY_DOWN:
             Down = false;
             break;
+        default:
+            break;
     }
 }
 
@@ -227,21 +198,130 @@ void processKeys()
 {
     if (Left)
     {
-        std::cout << currentAngle << std::endl;
+
+        //90 degree angle
+        if(currentAngle >= targetAngle){
+            std::cout << "Current Angle is less than target angle" << std::endl;
+            currentAngle += 0.01;
+        }
+        else {
+            std::cout << "Current Angle is equal to target angle" << std::endl;
+            targetAngle += 0.1;
+        }
 
     }
     if (Right)
     {
-        std::cout << currentAngle << std::endl;
+
+        //90 degree angle
+        if(currentAngle >= targetAngle){
+            currentAngle -= 0.01;
+            std::cout << "Current Angle is less than target angle" << std::endl;
+        }
+        else {
+            std::cout << "Current Angle is equal to target angle" << std::endl;
+            targetAngle -= 0.1;
+        }
 
     }
     if (Up)
     {
-        car.IncPos(0.0f, 0.2f);
+
+
+
+        float normalAngle;
+        if(currentAngle > 2*M_PI || currentAngle < 2*M_PI){
+            normalAngle = remainder(currentAngle, 2*M_PI);
+        }
+        else{
+            normalAngle = currentAngle;
+        }
+
+
+        //  Bottom Left -
+        //.
+        if(normalAngle < -M_PI){
+            car.IncPos(-0.2f, -0.2f);
+            orthoYmin -= 0.11;
+            orthoYmax -= 0.11;
+            orthoXmin -= 0.11;
+            orthoXmax -= 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        //   Bottom Right -
+        // .
+        else if(normalAngle < -(M_PI/2)){
+            car.IncPos(0.2f, -0.2f);
+            orthoYmin -= 0.11;
+            orthoYmax -= 0.11;
+            orthoXmin += 0.11;
+            orthoXmax += 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        // . Top Right -
+        //
+        else if(normalAngle < 0){
+            car.IncPos(0.2f, 0.2f);
+            orthoYmin += 0.11;
+            orthoYmax += 0.11;
+            orthoXmin += 0.11;
+            orthoXmax += 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        //   Bottom Right +
+        // .
+        else if(normalAngle > M_PI){
+            car.IncPos(0.2f, -0.2f);
+            orthoYmin -= 0.11;
+            orthoYmax -= 0.11;
+            orthoXmin += 0.11;
+            orthoXmax += 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        //   Bottom Left +
+        //.
+        else if(normalAngle > (M_PI/2)){
+            car.IncPos(-0.2f, -0.2f);
+            orthoYmin -= 0.11;
+            orthoYmax -= 0.11;
+            orthoXmin -= 0.11;
+            orthoXmax -= 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        //.  Top Left +
+        //
+        else if(normalAngle > 0){
+            car.IncPos(-0.2f, 0.2f);
+            orthoYmin += 0.11;
+            orthoYmax += 0.11;
+            orthoXmin -= 0.11;
+            orthoXmax -= 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+        else if(normalAngle == 0){
+            car.IncPos(0.0f, 0.2f);
+            orthoYmin += 0.11;
+            orthoYmax += 0.11;
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+
+        std::cout << "Normal Angle : " << normalAngle << std::endl;
+
     }
     if (Down)
     {
+
+        orthoYmin -= 0.09;
+        orthoYmax -= 0.09;
+        ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+
         car.IncPos(0.0f, -0.2f);
+    }
+}
+
+void keyFunction(unsigned char key, int x, int y){
+    if(key == 27){
+        glutLeaveMainLoop();
     }
 }
 
@@ -286,6 +366,7 @@ int main(int argc, char **argv)
 
     glutSpecialFunc(special);
     glutSpecialUpFunc(specialUp);
+    glutKeyboardFunc(keyFunction);
 
     glutIdleFunc(idle);
 
