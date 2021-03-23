@@ -38,7 +38,8 @@ Shader shader;
 Car car;
 Square trackUp;
 
-float Angle = 0.5f;
+float currentAngle = 0;
+float targetAngle = 0;
 
 //OPENGL FUNCTION PROTOTYPES
 void display();				//used as callback in glut for display.
@@ -76,6 +77,8 @@ void display()
 
     //Set default track position to 0
     float trackPosition = 0;
+    float roteAngle = 0;
+
 
     //Render a sequence of track
     for(int i = 0; i < 20; i++){
@@ -104,33 +107,49 @@ void display()
         ProjectionMatrix = glm::ortho(-25.0, 25.0, orthoYmin, orthoYmax);
 
         //180 degree angle
-        float roteAngle = 1.57*2;
+        roteAngle = 1.57*2;
 
         //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-        CarModelViewMatrix = glm::rotate(CarModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
     }
 
     //If the player is moving left, rotate player
     if (Left) {
 
         //90 degree angle
-        float roteAngle = 1.57;
+        if(currentAngle >= targetAngle){
+            std::cout << "Current Angle is less than target angle" << std::endl;
+            currentAngle += 0.01;
+        }
+        else {
+            std::cout << "Current Angle is equal to target angle" << std::endl;
+            targetAngle += 0.1;
+        }
 
         //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-        CarModelViewMatrix = glm::rotate(CarModelViewMatrix,roteAngle,glm::vec3(0.0, 0.0, 1.0));
+
     }
 
     //If the player is moving right, rotate player
     if (Right) {
 
         //90 degree angle
-        float roteAngle = -1.57;
+        if(currentAngle >= targetAngle){
+            currentAngle -= 0.01;
+            std::cout << "Current Angle is less than target angle" << std::endl;
+        }
+        else {
+            std::cout << "Current Angle is equal to target angle" << std::endl;
+            targetAngle -= 0.1;
+        }
 
         //Create a PlayerModelViewMatrix to rotate the player based on movement direction
-        CarModelViewMatrix = glm::rotate(CarModelViewMatrix, roteAngle, glm::vec3(0.0, 0.0, 1.0));
+
     }
 
-    glm::mat4 CarViewMatrix = glm::rotate(CarViewMatrix, car.getRot(), glm::vec3(0.0, 0.0, 1.0));
+    CarModelViewMatrix = glm::rotate(CarModelViewMatrix, currentAngle, glm::vec3(0.0, 0.0, 1.0));
+
+    std::cout << "Current Angle : " << currentAngle << std::endl;
+    std::cout << "Target Angle : " << targetAngle << std::endl;
 
     car.Render(shader, CarModelViewMatrix, ProjectionMatrix);
     glDisable(GL_BLEND);
@@ -172,7 +191,6 @@ void special(int key, int x, int y)
     {
         case GLUT_KEY_LEFT:
             Left = true;
-            Angle += 0.5;
             break;
         case GLUT_KEY_RIGHT:
             Right = true;
@@ -209,24 +227,12 @@ void processKeys()
 {
     if (Left)
     {
-        if(car.getRot() <= -3){
-            car.incRot(0.01);
-        }
-        else{
-            car.decRot(0.01);
-        }
-        std::cout << car.getRot() << std::endl;
+        std::cout << currentAngle << std::endl;
 
     }
     if (Right)
     {
-        if(car.getRot() <= -3){
-            car.decRot(0.01);
-        }
-        else{
-            car.incRot(0.01);
-        }
-        std::cout << car.getRot() << std::endl;
+        std::cout << currentAngle << std::endl;
 
     }
     if (Up)
