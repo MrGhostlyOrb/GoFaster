@@ -27,6 +27,7 @@ using namespace std;
 
 glm::mat4 ViewMatrix;  // matrix for the modelling and viewing
 glm::mat4 ProjectionMatrix; // matrix for the orthographic projection
+glm::mat4 TextProjectionMatrix;
 int screenWidth = 480, screenHeight = 480;
 
 //booleans to handle when the arrow keys are pressed or released.
@@ -117,7 +118,15 @@ void display()
 
     car.Render(shader, CarModelViewMatrix, ProjectionMatrix);
 
-    print(ProjectionMatrix, font, 0, 0, "Text");
+    std::string currentAngleStr = std::to_string(currentAngle);
+
+    glm::mat4 StoreProjectionMatrix = ProjectionMatrix;
+
+    ProjectionMatrix = glm::ortho(-25,25,-25,25);
+
+    print(ProjectionMatrix, font, 0, 0, currentAngleStr.c_str());
+
+    ProjectionMatrix = StoreProjectionMatrix;
 
     glDisable(GL_BLEND);
 
@@ -152,7 +161,7 @@ void init()
     trackUp.Init(shader, blue, "roadTexture_84.png");
     trackRight.Init(shader, blue, "roadTexture_84.png");
 
-    font.init("fonts/Product Sans Regular.ttf", 22);
+    font.init("fonts/arialbd.ttf", 12);
 
 
 
@@ -213,11 +222,11 @@ void processKeys()
         //90 degree angle
         if(currentAngle >= targetAngle){
             std::cout << "Current Angle is less than target angle" << std::endl;
-            currentAngle += 0.01;
+            currentAngle += 0.02;
         }
         else {
             std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle += 0.1;
+            targetAngle += 0.2;
         }
 
     }
@@ -226,12 +235,12 @@ void processKeys()
 
         //90 degree angle
         if(currentAngle >= targetAngle){
-            currentAngle -= 0.01;
+            currentAngle -= 0.04;
             std::cout << "Current Angle is less than target angle" << std::endl;
         }
         else {
             std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle -= 0.1;
+            targetAngle -= 0.4;
         }
 
     }
@@ -251,7 +260,8 @@ void processKeys()
         //  Bottom Left -
         //.
         if(normalAngle < -M_PI){
-            car.IncPos(-0.2f, -0.2f);
+            std::cout << "(-cos, -sin)" << std::endl;
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin -= 0.11;
             orthoYmax -= 0.11;
             orthoXmin -= 0.11;
@@ -261,7 +271,8 @@ void processKeys()
         //   Bottom Right -
         // .
         else if(normalAngle < -(M_PI/2)){
-            car.IncPos(0.2f, -0.2f);
+            std::cout << "(-sin, cos)" << std::endl;
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin -= 0.11;
             orthoYmax -= 0.11;
             orthoXmin += 0.11;
@@ -271,7 +282,8 @@ void processKeys()
         // . Top Right -
         //
         else if(normalAngle < 0){
-            car.IncPos(0.2f, 0.2f);
+            std::cout << "(-sin, cos)" << std::endl;
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin += 0.11;
             orthoYmax += 0.11;
             orthoXmin += 0.11;
@@ -281,7 +293,7 @@ void processKeys()
         //   Bottom Right +
         // .
         else if(normalAngle > M_PI){
-            car.IncPos(0.2f, -0.2f);
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin -= 0.11;
             orthoYmax -= 0.11;
             orthoXmin += 0.11;
@@ -291,7 +303,7 @@ void processKeys()
         //   Bottom Left +
         //.
         else if(normalAngle > (M_PI/2)){
-            car.IncPos(-0.2f, -0.2f);
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin -= 0.11;
             orthoYmax -= 0.11;
             orthoXmin -= 0.11;
@@ -301,7 +313,7 @@ void processKeys()
         //.  Top Left +
         //
         else if(normalAngle > 0){
-            car.IncPos(-0.2f, 0.2f);
+            car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin += 0.11;
             orthoYmax += 0.11;
             orthoXmin -= 0.11;
