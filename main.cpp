@@ -52,7 +52,9 @@ float currentAngle = 0;
 float targetAngle = 0;
 bool isReversing = false;
 
-const float TURNING_SPEED = 0.1;
+const float TURNING_SPEED = 0.8;
+const float SPEED = 2;
+const float REVERSE_SPEED = 1;
 
 //OPENGL FUNCTION PROTOTYPES
 void display();				//used as callback in glut for display.
@@ -260,21 +262,21 @@ void processKeys()
             //90 degree angle
             if(currentAngle >= targetAngle){
                 std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
-                currentAngle += 0.04;
+                currentAngle += TURNING_SPEED/10;
             }
             else{
                 std::cout << "Current Angle is equal to target angle" << std::endl;
-                targetAngle += 0.4;
+                targetAngle += TURNING_SPEED;
             }
         }
         else{
             if(currentAngle >= targetAngle){
                 std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
-                currentAngle -= 0.04;
+                currentAngle -= TURNING_SPEED/10;
             }
             else{
                 std::cout << "Current Angle is equal to target angle" << std::endl;
-                targetAngle -= 0.4;
+                targetAngle -= TURNING_SPEED;
             }
         }
 
@@ -287,21 +289,21 @@ void processKeys()
             //90 degree angle
             if(currentAngle >= targetAngle){
                 std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
-                currentAngle -= 0.04;
+                currentAngle -= TURNING_SPEED/10;
             }
             else{
                 std::cout << "Current Angle is equal to target angle" << std::endl;
-                targetAngle -= 0.4;
+                targetAngle -= TURNING_SPEED;
             }
         }
         else{
             if(currentAngle >= targetAngle){
                 std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
-                currentAngle += 0.04;
+                currentAngle += TURNING_SPEED/10;
             }
             else{
                 std::cout << "Current Angle is equal to target angle" << std::endl;
-                targetAngle += 0.4;
+                targetAngle += TURNING_SPEED;
             }
         }
 
@@ -323,63 +325,63 @@ void processKeys()
         //.
         if(normalAngle < -M_PI){
             std::cout << "(-cos, -sin)" << std::endl;
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin -= -cos(normalAngle);
-            orthoYmax -= -cos(normalAngle);
-            orthoXmin -= sin(normalAngle);
-            orthoXmax -= sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin -= -cos(normalAngle) * SPEED;
+            orthoYmax -= -cos(normalAngle) * SPEED;
+            orthoXmin -= sin(normalAngle) * SPEED;
+            orthoXmax -= sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         //   Bottom Right - G
         // .
         else if(normalAngle < -(M_PI/2)){
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin -= -cos(normalAngle);
-            orthoYmax -= -cos(normalAngle);
-            orthoXmin += -sin(normalAngle);
-            orthoXmax += -sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin -= -cos(normalAngle) * SPEED;
+            orthoYmax -= -cos(normalAngle) * SPEED;
+            orthoXmin += -sin(normalAngle) * SPEED;
+            orthoXmax += -sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         // . Top Right - G
         //
         else if(normalAngle < 0){
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin += cos(normalAngle);
-            orthoYmax += cos(normalAngle);
-            orthoXmin += -sin(normalAngle);
-            orthoXmax += -sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin += cos(normalAngle) * SPEED;
+            orthoYmax += cos(normalAngle) * SPEED;
+            orthoXmin += -sin(normalAngle) * SPEED;
+            orthoXmax += -sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         //   Bottom Right +
         // .
         else if(normalAngle > M_PI){
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin -= -cos(normalAngle);
-            orthoYmax -= -cos(normalAngle);
-            orthoXmin += -sin(normalAngle);
-            orthoXmax += -sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin -= -cos(normalAngle) * SPEED;
+            orthoYmax -= -cos(normalAngle) * SPEED;
+            orthoXmin += -sin(normalAngle) * SPEED;
+            orthoXmax += -sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         //   Bottom Left + G
         //.
         else if(normalAngle > (M_PI/2)){
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin -= -cos(normalAngle);
-            orthoYmax -= -cos(normalAngle);
-            orthoXmin -= sin(normalAngle);
-            orthoXmax -= sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin -= -cos(normalAngle) * SPEED;
+            orthoYmax -= -cos(normalAngle) * SPEED;
+            orthoXmin -= sin(normalAngle) * SPEED;
+            orthoXmax -= sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         //.  Top Left +
         //
         else if(normalAngle >= 0){
-            car.IncPos(-sin(normalAngle), cos(normalAngle));
-            orthoYmin += cos(normalAngle);
-            orthoYmax += cos(normalAngle);
-            orthoXmin -= sin(normalAngle);
-            orthoXmax -= sin(normalAngle);
+            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
+            orthoYmin += cos(normalAngle) * SPEED;
+            orthoYmax += cos(normalAngle) * SPEED;
+            orthoXmin -= sin(normalAngle) * SPEED;
+            orthoXmax -= sin(normalAngle) * SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
         /*else if(normalAngle == 0){
@@ -411,63 +413,63 @@ void processKeys()
         //.
         if(normalAngle < -M_PI){
             std::cout << "(-cos, -sin)" << std::endl;
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin -= cos(normalAngle);
-            orthoYmax -= cos(normalAngle);
-            orthoXmin -= -sin(normalAngle);
-            orthoXmax -= -sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin -= cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax -= cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin -= -sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax -= -sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
             //   Bottom Right - G
             // .
         else if(normalAngle < -(M_PI/2)){
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin -= cos(normalAngle);
-            orthoYmax -= cos(normalAngle);
-            orthoXmin += sin(normalAngle);
-            orthoXmax += sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin -= cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax -= cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin += sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax += sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
             // . Top Right - G
             //
         else if(normalAngle < 0){
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin += -cos(normalAngle);
-            orthoYmax += -cos(normalAngle);
-            orthoXmin += sin(normalAngle);
-            orthoXmax += sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin += -cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax += -cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin += sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax += sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
             //   Bottom Right +
             // .
         else if(normalAngle > M_PI){
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin -= cos(normalAngle);
-            orthoYmax -= cos(normalAngle);
-            orthoXmin += sin(normalAngle);
-            orthoXmax += sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin -= cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax -= cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin += sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax += sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
             //   Bottom Left + G
             //.
         else if(normalAngle > (M_PI/2)){
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin -= cos(normalAngle);
-            orthoYmax -= cos(normalAngle);
-            orthoXmin -= -sin(normalAngle);
-            orthoXmax -= -sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin -= cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax -= cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin -= -sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax -= -sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
             //.  Top Left +
             //
         else if(normalAngle >= 0){
-            car.IncPos(sin(normalAngle), -cos(normalAngle));
-            orthoYmin += -cos(normalAngle);
-            orthoYmax += -cos(normalAngle);
-            orthoXmin -= -sin(normalAngle);
-            orthoXmax -= -sin(normalAngle);
+            car.IncPos(sin(normalAngle) * REVERSE_SPEED, -cos(normalAngle) * REVERSE_SPEED);
+            orthoYmin += -cos(normalAngle) * REVERSE_SPEED;
+            orthoYmax += -cos(normalAngle) * REVERSE_SPEED;
+            orthoXmin -= -sin(normalAngle) * REVERSE_SPEED;
+            orthoXmax -= -sin(normalAngle) * REVERSE_SPEED;
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
     }
