@@ -106,7 +106,37 @@ void display()
 
     trackPosition = 0;
     for(int i = 0; i < 20; i++){
+
+        //Create a TrackModelViewMatrix to position the track on an increasing x,y
+        glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200.0, trackPosition, 0.0));
+
+        //Render the track pieces
+        trackUp.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+
+        //Increase track position
+        trackPosition += 10;
+    }
+
+    trackPosition = 0;
+    for(int i = 0; i < 20; i++){
         glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 0.0, 0.0));
+
+        float x = (M_PI/2);
+
+        TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
+
+        trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+
+        trackPosition += 10;
+    }
+
+    trackPosition = 0;
+    for(int i = 0; i < 20; i++){
+        glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 200.0, 0.0));
+
+        float x = (M_PI/2);
+
+        TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
 
         trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
 
@@ -318,7 +348,7 @@ void processKeys()
         }
         //.  Top Left +
         //
-        else if(normalAngle > 0){
+        else if(normalAngle >= 0){
             car.IncPos(-sin(normalAngle), cos(normalAngle));
             orthoYmin += cos(normalAngle);
             orthoYmax += cos(normalAngle);
@@ -326,12 +356,12 @@ void processKeys()
             orthoXmax -= sin(normalAngle);
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
         }
-        else if(normalAngle == 0){
+        /*else if(normalAngle == 0){
             car.IncPos(0.0, TURNING_SPEED);
             orthoYmin += -sin(normalAngle);
             orthoYmax += -sin(normalAngle);
             ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
-        }
+        }*/
 
         std::cout << "Normal Angle : " << normalAngle << std::endl;
 
