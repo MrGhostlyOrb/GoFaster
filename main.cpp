@@ -50,6 +50,7 @@ freetype::Font font;
 
 float currentAngle = 0;
 float targetAngle = 0;
+bool isReversing = false;
 
 const float TURNING_SPEED = 0.1;
 
@@ -255,34 +256,59 @@ void processKeys()
     if (Left)
     {
 
-        //90 degree angle
-        if(currentAngle >= targetAngle){
-            std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
-            currentAngle += 0.04;
+        if(!isReversing){
+            //90 degree angle
+            if(currentAngle >= targetAngle){
+                std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
+                currentAngle += 0.04;
+            }
+            else{
+                std::cout << "Current Angle is equal to target angle" << std::endl;
+                targetAngle += 0.4;
+            }
         }
         else{
-            std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle += 0.4;
+            if(currentAngle >= targetAngle){
+                std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
+                currentAngle -= 0.04;
+            }
+            else{
+                std::cout << "Current Angle is equal to target angle" << std::endl;
+                targetAngle -= 0.4;
+            }
         }
+
 
     }
     if (Right)
     {
 
-        //90 degree angle
-        if(currentAngle >= targetAngle){
-            currentAngle -= 0.04;
-            std::cout << "Current Angle is less than target angle" << std::endl;
+        if(!isReversing){
+            //90 degree angle
+            if(currentAngle >= targetAngle){
+                std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
+                currentAngle -= 0.04;
+            }
+            else{
+                std::cout << "Current Angle is equal to target angle" << std::endl;
+                targetAngle -= 0.4;
+            }
         }
         else{
-            std::cout << "Current Angle is equal to target angle" << std::endl;
-            targetAngle -= 0.4;
+            if(currentAngle >= targetAngle){
+                std::cout << "Current Angle is greater than than target angle" << currentAngle << " : " << targetAngle << std::endl;
+                currentAngle += 0.04;
+            }
+            else{
+                std::cout << "Current Angle is equal to target angle" << std::endl;
+                targetAngle += 0.4;
+            }
         }
 
     }
     if (Up)
     {
-
+        isReversing = false;
         float normalAngle;
         if(currentAngle > 2*M_PI || currentAngle < 2*M_PI){
             normalAngle = remainder(currentAngle, 2*M_PI);
@@ -369,11 +395,81 @@ void processKeys()
     if (Down)
     {
 
-        orthoYmin -= 0.09;
-        orthoYmax -= 0.09;
-        ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        isReversing = true;
 
-        car.IncPos(0.0f, -0.2f);
+        float normalAngle;
+        if(currentAngle > 2*M_PI || currentAngle < 2*M_PI){
+            normalAngle = remainder(currentAngle, 2*M_PI);
+        }
+        else{
+            normalAngle = currentAngle;
+        }
+
+        std::cout << normalAngle << std::endl;
+
+        //  Bottom Left -
+        //.
+        if(normalAngle < -M_PI){
+            std::cout << "(-cos, -sin)" << std::endl;
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin -= cos(normalAngle);
+            orthoYmax -= cos(normalAngle);
+            orthoXmin -= -sin(normalAngle);
+            orthoXmax -= -sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+            //   Bottom Right - G
+            // .
+        else if(normalAngle < -(M_PI/2)){
+            std::cout << "(-sin, cos)" << std::endl;
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin -= cos(normalAngle);
+            orthoYmax -= cos(normalAngle);
+            orthoXmin += sin(normalAngle);
+            orthoXmax += sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+            // . Top Right - G
+            //
+        else if(normalAngle < 0){
+            std::cout << "(-sin, cos)" << std::endl;
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin += -cos(normalAngle);
+            orthoYmax += -cos(normalAngle);
+            orthoXmin += sin(normalAngle);
+            orthoXmax += sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+            //   Bottom Right +
+            // .
+        else if(normalAngle > M_PI){
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin -= cos(normalAngle);
+            orthoYmax -= cos(normalAngle);
+            orthoXmin += sin(normalAngle);
+            orthoXmax += sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+            //   Bottom Left + G
+            //.
+        else if(normalAngle > (M_PI/2)){
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin -= cos(normalAngle);
+            orthoYmax -= cos(normalAngle);
+            orthoXmin -= -sin(normalAngle);
+            orthoXmax -= -sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
+            //.  Top Left +
+            //
+        else if(normalAngle >= 0){
+            car.IncPos(sin(normalAngle), -cos(normalAngle));
+            orthoYmin += -cos(normalAngle);
+            orthoYmax += -cos(normalAngle);
+            orthoXmin -= -sin(normalAngle);
+            orthoXmax -= -sin(normalAngle);
+            ProjectionMatrix = glm::ortho(orthoXmin, orthoXmax, orthoYmin, orthoYmax);
+        }
     }
 }
 
