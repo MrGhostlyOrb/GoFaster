@@ -34,6 +34,11 @@ void Square::SetSideSize(float size)
 	m_SideSize = size;
 }
 
+float Square::GetSideSize()
+{
+    return m_SideSize;
+}
+
 
 void Square::Init(Shader& shader, float colour[3], std::string filename)
 {

@@ -20,6 +20,7 @@ using namespace std;
 #include "Car.h"
 #include "Square.h"
 #include "FreeType.h"
+#include "Wall.h"
 
 #include <iostream>
 using namespace std;
@@ -33,6 +34,7 @@ Shader shader;
 Car car;
 Square trackUp;
 Square trackRight;
+Wall wall;
 
 freetype::Font font;
 
@@ -43,10 +45,10 @@ bool isReversing = false;
 
 //Speed and other modifiers
 const float TURNING_SPEED = 0.8;
-const float SPEED = 2;
-const float REVERSE_SPEED = 1;
+float velocity = 0;
+const float REVERSE_SPEED = 0.5;
 const float ORTHO = 25;
-const float ZOOM = 2;
+const float ZOOM = 1;
 
 //Ortho assignments
 double orthoYMax = ORTHO * ZOOM;
@@ -87,6 +89,18 @@ void display() {
 
     //Create a ViewMatrix with the identity matrix
     ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
+
+    glm::mat4 WallModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(wall.GetXPos(), wall.GetYPos(), 0.0));
+
+    wall.Render(shader, WallModelViewMatrix, ProjectionMatrix);
+
+
+    if(car.IsInCollision(wall.GetOBB())){
+        cout << "Collided" << endl;
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+
+
 
     //Create a CarModelViewMatrix to transform the car to the correct x,y
     glm::mat4 CarModelViewMatrix = ViewMatrix;
@@ -184,15 +198,25 @@ void init() {
         std::cout << "failed to load shader" << std::endl;
     }
 
+
+
     ///This part commented is to scale the width of the sprite to match the dimensions of the car.png image.
     car.SetWidth(5.0f);
     car.SetHeight(10.0f);
+    wall.SetWidth(500.0f);
+    wall.SetHeight(5.0f);
+
+    wall.SetXpos(-5);
+    wall.SetYpos(-15);
+
     trackUp.SetWidth(10.0f * (500 / 264.0f));
     trackUp.SetHeight(10.0f);
     trackRight.SetWidth(10.0f * (500 / 264.0f));
     trackRight.SetHeight(10.0f);
     float red[3] = {1, 0, 0};
     float blue[3] = {0, 0, 1};
+
+    wall.Init(shader, red, "roadTexture_26.png");
 
     car.Init(shader, red, "car.png");
     trackUp.Init(shader, blue, "roadTexture_84.png");
@@ -234,9 +258,11 @@ void specialUp(int key, int x, int y) {
             break;
         case GLUT_KEY_UP:
             keyUp = false;
+            velocity = 0;
             break;
         case GLUT_KEY_DOWN:
             keyDown = false;
+            velocity = 0;
             break;
         default:
             break;
@@ -295,6 +321,7 @@ void processKeys() {
     }
 
     if (keyUp) {
+        velocity += 0.005;
         isReversing = false;
         float normalAngle;
         if (currentAngle > 2 * M_PI || currentAngle < 2 * M_PI) {
@@ -309,63 +336,63 @@ void processKeys() {
             //.
         if (normalAngle < -M_PI) {
             std::cout << "(-cos, -sin)" << std::endl;
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin -= -cos(normalAngle) * SPEED;
-            orthoYMax -= -cos(normalAngle) * SPEED;
-            orthoXMin -= sin(normalAngle) * SPEED;
-            orthoXMax -= sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin -= -cos(normalAngle) * velocity;
+            orthoYMax -= -cos(normalAngle) * velocity;
+            orthoXMin -= sin(normalAngle) * velocity;
+            orthoXMax -= sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
             //   Bottom keyRight - G
             // .
         else if (normalAngle < -(M_PI / 2)) {
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin -= -cos(normalAngle) * SPEED;
-            orthoYMax -= -cos(normalAngle) * SPEED;
-            orthoXMin += -sin(normalAngle) * SPEED;
-            orthoXMax += -sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin -= -cos(normalAngle) * velocity;
+            orthoYMax -= -cos(normalAngle) * velocity;
+            orthoXMin += -sin(normalAngle) * velocity;
+            orthoXMax += -sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
             // . Top keyRight - G
             //
         else if (normalAngle < 0) {
             std::cout << "(-sin, cos)" << std::endl;
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin += cos(normalAngle) * SPEED;
-            orthoYMax += cos(normalAngle) * SPEED;
-            orthoXMin += -sin(normalAngle) * SPEED;
-            orthoXMax += -sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin += cos(normalAngle) * velocity;
+            orthoYMax += cos(normalAngle) * velocity;
+            orthoXMin += -sin(normalAngle) * velocity;
+            orthoXMax += -sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
             //   Bottom keyRight +
             // .
         else if (normalAngle > M_PI) {
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin -= -cos(normalAngle) * SPEED;
-            orthoYMax -= -cos(normalAngle) * SPEED;
-            orthoXMin += -sin(normalAngle) * SPEED;
-            orthoXMax += -sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin -= -cos(normalAngle) * velocity;
+            orthoYMax -= -cos(normalAngle) * velocity;
+            orthoXMin += -sin(normalAngle) * velocity;
+            orthoXMax += -sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
             //   Bottom keyLeft + G
             //.
         else if (normalAngle > (M_PI / 2)) {
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin -= -cos(normalAngle) * SPEED;
-            orthoYMax -= -cos(normalAngle) * SPEED;
-            orthoXMin -= sin(normalAngle) * SPEED;
-            orthoXMax -= sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin -= -cos(normalAngle) * velocity;
+            orthoYMax -= -cos(normalAngle) * velocity;
+            orthoXMin -= sin(normalAngle) * velocity;
+            orthoXMax -= sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
             //.  Top keyLeft +
             //
         else if (normalAngle >= 0) {
-            car.IncPos(-sin(normalAngle) * SPEED, cos(normalAngle) * SPEED);
-            orthoYMin += cos(normalAngle) * SPEED;
-            orthoYMax += cos(normalAngle) * SPEED;
-            orthoXMin -= sin(normalAngle) * SPEED;
-            orthoXMax -= sin(normalAngle) * SPEED;
+            car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
+            orthoYMin += cos(normalAngle) * velocity;
+            orthoYMax += cos(normalAngle) * velocity;
+            orthoXMin -= sin(normalAngle) * velocity;
+            orthoXMax -= sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
 
@@ -375,6 +402,7 @@ void processKeys() {
     if (keyDown) {
 
         isReversing = true;
+        velocity += 0.005;
 
         float normalAngle;
         if (currentAngle > 2 * M_PI || currentAngle < 2 * M_PI) {

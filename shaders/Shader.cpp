@@ -28,7 +28,9 @@ bool Shader::load(const std::string name, const char* vertexFilename, const char
 	
 	//here we create a vertex shader and set the shader source
 	m_vertexShader = loadShader(vertexFilename, GL_VERTEX_SHADER);
-	
+
+	std::cout << vertexFilename << std::endl;
+
 	//next compile the vertex shader
 	glCompileShader(m_vertexShader);
 	
@@ -47,6 +49,8 @@ bool Shader::load(const std::string name, const char* vertexFilename, const char
 	{
 		//create a fragment shader and set the shader source
 		m_fragmentShader = loadShader(fragmentFilename, GL_FRAGMENT_SHADER);
+
+		std::cout << fragmentFilename << std::endl;
 
 		//compile the fragment shader
 		glCompileShader(m_fragmentShader);
