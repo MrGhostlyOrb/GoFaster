@@ -19,12 +19,12 @@ Square::Square()
 	m_Ypos = 0.0f;
 }
 
-void Square::SetWidth(float size)
+void Square::setWidth(float size)
 {
     m_Width = size;
 }
 
-void Square::SetHeight(float size)
+void Square::setHeight(float size)
 {
     m_Height = size;
 }
@@ -40,7 +40,7 @@ float Square::GetSideSize()
 }
 
 
-void Square::Init(Shader& shader, float colour[3], std::string filename)
+void Square::init(Shader& shader, float *colour, std::string filename)
 {
     //load png image
     int imageHeight = 0;

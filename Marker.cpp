@@ -1,55 +1,46 @@
-#include "Wall.h"
-#include "shaders/Shader.h"
-#include <string>
+#include "Marker.h"
+
 #include "ImageLoading.h"
 
 #include <string>
-
 #include <iostream>
 
+const unsigned int NumberOfVertices = 6;
 
-
-Wall::Wall()
+Marker::Marker()
 {
     m_vaoID = 0;
     m_vboID[0] = 0;
     m_vboID[1] = 0;
+    m_SideSize = 0.0f;
     m_Width = 0.0f;
     m_Height = 0.0f;
-    m_NumberOfVerts = 0;
-    m_xpos = 0;
-    m_ypos = 0;
-    m_rot = 0;
+    m_XPos = 0.0f;
+    m_Ypos = 0.0f;
 }
 
-void Wall::setWidth(float size)
+void Marker::setWidth(float size)
 {
     m_Width = size;
 }
 
-void Wall::setHeight(float size)
+void Marker::setHeight(float size)
 {
     m_Height = size;
 }
 
-void Wall::setXpos(float x)
+void Marker::SetSideSize(float size)
 {
-    m_xpos = x;
-}
-void Wall::setYpos(float y)
-{
-    m_ypos = y;
-}
-float Wall::getXPos()
-{
-    return m_xpos;
-}
-float Wall::getYPos()
-{
-    return m_ypos;
+    m_SideSize = size;
 }
 
-void Wall::init(Shader& shader, float *colour, std::string filename)
+float Marker::GetSideSize()
+{
+    return m_SideSize;
+}
+
+
+void Marker::init(Shader& shader, float *colour, std::string filename)
 {
     //load png image
     int imageHeight = 0;
@@ -65,6 +56,7 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     bool success = ImageLoading::loadImage(filename);
+    std::cout << filename << std::endl;
     if (!success) {
         std::cout << "Unable to load image file" << std::endl;
         glDeleteTextures(1, &m_TexName);
@@ -75,12 +67,10 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
         std::cout << "Image loaded " << std::endl;
     }
 
-
-
-
     //Create the geometry
     m_NumberOfVerts = 6;
-    float vert[18];	// create a vertex array
+    float vert[18];
+    float halfSize = m_SideSize / 2.0f;
 
     float halfWidth = m_Width / 2.0f;
     float halfHeight = m_Height / 2.0f;
@@ -92,23 +82,6 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
     vert[9] = -halfWidth; vert[10] = halfHeight; vert[11] = 0.0;
     vert[12] = halfWidth; vert[13] = halfHeight; vert[14] = 0.0;
     vert[15] = halfWidth; vert[16] = -halfHeight; vert[17] = 0.0;
-
-    /********INIT CORNERS FOR OBB***********/
-
-    obb.vertOriginal[0].x = -halfWidth;
-    obb.vertOriginal[0].y = -halfHeight;
-
-    obb.vertOriginal[1].x = halfWidth;
-    obb.vertOriginal[1].y = -halfHeight;
-
-    obb.vertOriginal[2].x = halfWidth;
-    obb.vertOriginal[2].y = halfHeight;
-
-    obb.vertOriginal[3].x = -halfWidth;
-    obb.vertOriginal[3].y = halfHeight;
-
-    /*******************/
-
 
     float tex[12];
     tex[0] = 0.0f;	 tex[1] = 1.0;
@@ -134,8 +107,7 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
     // First VAO setup
     glBindVertexArray(m_vaoID);
 
-    glGenBuffers(3, m_vboID); // we need three VBOs - one for the vertices and one for the colours
-    //and an extra one for the texture coordinates
+    glGenBuffers(3, m_vboID); // we need two VBOs - one for the vertices and one for the colours
 
     //Lets set up the vertices.
     glBindBuffer(GL_ARRAY_BUFFER, m_vboID[0]);
@@ -158,7 +130,6 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
     //location in shader, number of componentns,  type, normalised, stride, pointer to first attribute
     glVertexAttribPointer(colorLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    //Now set up the texture coordinates
     glBindBuffer(GL_ARRAY_BUFFER, m_vboID[2]);
     glBufferData(GL_ARRAY_BUFFER, m_NumberOfVerts * 3 * sizeof(GLfloat), tex, GL_STATIC_DRAW);
 
@@ -174,18 +145,15 @@ void Wall::init(Shader& shader, float *colour, std::string filename)
     glBindVertexArray(0);
 }
 
-void Wall::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix)
+void Marker::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix)
 {
-    /****UPDATE THE CORNER VALUES BASED ON TRANSFORMATION***/
-    obb.transformPoints(ModelViewMatrix);
-    /*******************************************************/
-
     glUseProgram(shader.handle());  // use the shader
 
     //set the DiffuseMap in GLSL to the texture unit 0.
     glUniform1i(glGetUniformLocation(shader.handle(), "DiffuseMap"), 0);
 
     glBindTexture(GL_TEXTURE_2D, m_TexName);
+
 
     //set the uniform for the projectionmatrix
     glUniformMatrix4fv(glGetUniformLocation(shader.handle(), "ProjectionMatrix"), 1, GL_FALSE, &ProjectionMatrix[0][0]);
@@ -201,28 +169,18 @@ void Wall::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& Project
     glUseProgram(0); //turn off the current shader
 }
 
-OBB& Wall::getOBB()
-{
-    return obb;
+void Marker::SetXPos(float XPos) {
+    this->m_XPos = XPos;
 }
 
-bool Wall::IsInCollision(OBB &anotherOBB)
-{
-    if (obb.SAT2D(anotherOBB))
-    {
-        return true;
-    }
-    return false;
+void Marker::SetYPos(float YPos) {
+    this->m_Ypos = YPos;
 }
 
-void Wall::incRot(float rot) {
-    this->m_rot += rot;
+float Marker::getXPos() {
+    return this->m_XPos;
 }
 
-void Wall::decRot(float rot) {
-    this->m_rot -= rot;
-}
-
-float Wall::getRot() {
-    return this->m_rot;
+float Marker::getYPos() {
+    return this->m_Ypos;
 }

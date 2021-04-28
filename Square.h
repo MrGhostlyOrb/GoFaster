@@ -22,12 +22,12 @@ private:
 
 public:
 	Square();					//default constructor
-	void Init(Shader& shader, float colour[3], std::string filename);
+	void init(Shader& shader, float *colour, std::string filename);
 	void SetSideSize(float size);
 	float GetSideSize();
 	void Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix);
-    void SetWidth(float size);
-    void SetHeight(float size);
+    void setWidth(float size);
+    void setHeight(float size);
     void SetXPos(float XPos);
     void SetYPos(float YPos);
     float GetXPos();

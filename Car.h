@@ -30,17 +30,17 @@ private:
 
 public:
 	Car();					//default constructor
-	void Init(Shader& shader, float colour[3], std::string filename);
-	void SetWidth(float size);
-	void SetHeight(float size);
+	void init(Shader& shader, float *colour, std::string filename);
+	void setWidth(float size);
+	void setHeight(float size);
 	void SetXpos(float x);
 	void SetYpos(float y);
-	float GetXPos();
-	float GetYPos();
+	float getXPos();
+	float getYPos();
 	void IncPos(float x, float y);
 	void Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix);
 	OBB& GetOBB();
-	bool IsInCollision(OBB &anotherOBB);
+	bool isInCollision(OBB &anotherOBB);
 
     void incRot(float rot);
 

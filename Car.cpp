@@ -22,12 +22,12 @@ Car::Car()
     m_rot = 0;
 }
 
-void Car::SetWidth(float size)
+void Car::setWidth(float size)
 {
 	m_Width = size;
 }
 
-void Car::SetHeight(float size)
+void Car::setHeight(float size)
 {
 	m_Height = size;
 }
@@ -40,11 +40,11 @@ void Car::SetYpos(float y)
 {
 	m_ypos = y;
 }
-float Car::GetXPos()
+float Car::getXPos()
 {
 	return m_xpos;
 }
-float Car::GetYPos()
+float Car::getYPos()
 {
 	return m_ypos;
 }
@@ -54,7 +54,7 @@ void Car::IncPos(float x, float y)
 	m_xpos += x;
 	m_ypos += y;
 }
-void Car::Init(Shader& shader, float colour[3], std::string filename)
+void Car::init(Shader& shader, float *colour, std::string filename)
 {
 	//load png image
 	int imageHeight = 0;
@@ -211,7 +211,7 @@ OBB& Car::GetOBB()
 	return obb;
 }
 
-bool Car::IsInCollision(OBB &anotherOBB)
+bool Car::isInCollision(OBB &anotherOBB)
 {
 	if (obb.SAT2D(anotherOBB))
 	{

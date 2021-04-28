@@ -30,15 +30,15 @@ private:
 
 public:
     Wall();					//default constructor
-    void Init(Shader& shader, float colour[3], std::string filename);
-    void SetWidth(float size);
-    void SetHeight(float size);
-    void SetXpos(float x);
-    void SetYpos(float y);
-    float GetXPos();
-    float GetYPos();
+    void init(Shader& shader, float *colour, std::string filename);
+    void setWidth(float size);
+    void setHeight(float size);
+    void setXpos(float x);
+    void setYpos(float y);
+    float getXPos();
+    float getYPos();
     void Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix);
-    OBB& GetOBB();
+    OBB& getOBB();
     bool IsInCollision(OBB &anotherOBB);
 
     void incRot(float rot);
