@@ -4,6 +4,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "OBB.h"
 #include <string>
 
 class Marker
@@ -20,6 +21,8 @@ private:
     float m_XPos;
     float m_Ypos;
 
+    OBB obb; //obb object for oriented bounding box collision
+
 public:
     Marker();					//default constructor
     void init(Shader& shader, float *colour, std::string filename);
@@ -32,4 +35,7 @@ public:
     void SetYPos(float YPos);
     float getXPos();
     float getYPos();
+
+    bool isInCollision(OBB &anotherOBB);
+    OBB &GetOBB();
 };

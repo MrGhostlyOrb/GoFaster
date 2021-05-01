@@ -1,6 +1,7 @@
 #include "Marker.h"
 
 #include "ImageLoading.h"
+#include "OBB.h"
 
 #include <string>
 #include <iostream>
@@ -17,6 +18,11 @@ Marker::Marker()
     m_Height = 0.0f;
     m_XPos = 0.0f;
     m_Ypos = 0.0f;
+}
+
+OBB& Marker::GetOBB()
+{
+    return obb;
 }
 
 void Marker::setWidth(float size)
@@ -67,6 +73,8 @@ void Marker::init(Shader& shader, float *colour, std::string filename)
         std::cout << "Image loaded " << std::endl;
     }
 
+
+
     //Create the geometry
     m_NumberOfVerts = 6;
     float vert[18];
@@ -74,6 +82,22 @@ void Marker::init(Shader& shader, float *colour, std::string filename)
 
     float halfWidth = m_Width / 2.0f;
     float halfHeight = m_Height / 2.0f;
+
+    /********INIT CORNERS FOR OBB***********/
+
+    obb.vertOriginal[0].x = -halfWidth;
+    obb.vertOriginal[0].y = -halfHeight;
+
+    obb.vertOriginal[1].x = halfWidth;
+    obb.vertOriginal[1].y = -halfHeight;
+
+    obb.vertOriginal[2].x = halfWidth;
+    obb.vertOriginal[2].y = halfHeight;
+
+    obb.vertOriginal[3].x = -halfWidth;
+    obb.vertOriginal[3].y = halfHeight;
+
+    /*******************/
 
     vert[0] = -halfWidth; vert[1] = halfHeight; vert[2] = 0.0; //x,y,z values for each vertex
     vert[3] = -halfWidth; vert[4] = -halfHeight; vert[5] = 0.0;
@@ -147,6 +171,10 @@ void Marker::init(Shader& shader, float *colour, std::string filename)
 
 void Marker::Render(Shader& shader, glm::mat4& ModelViewMatrix, glm::mat4& ProjectionMatrix)
 {
+
+    /****UPDATE THE CORNER VALUES BASED ON TRANSFORMATION***/
+    obb.transformPoints(ModelViewMatrix);
+    /*******************************************************/
     glUseProgram(shader.handle());  // use the shader
 
     //set the DiffuseMap in GLSL to the texture unit 0.
@@ -183,4 +211,13 @@ float Marker::getXPos() {
 
 float Marker::getYPos() {
     return this->m_Ypos;
+}
+
+bool Marker::isInCollision(OBB &anotherOBB)
+{
+    if (obb.SAT2D(anotherOBB))
+    {
+        return true;
+    }
+    return false;
 }
