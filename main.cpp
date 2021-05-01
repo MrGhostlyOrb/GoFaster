@@ -111,11 +111,20 @@ bool npcCarFinished = false;
 bool carFinished = false;
 bool renderFinish = false;
 bool renderCountdown = false;
+bool clockRunning = false;
+
+int currentLevel = 0;
+bool renderLevel1 = false;
+bool renderLevel2 = false;
 
 int npcCollisionCount = 0;
 int carCollisionCount = 0;
 
 int countdownCount = 0;
+int timer = 0;
+int storeTime = 0;
+
+int bannerX = 0;
 
 //OPENGL FUNCTION PROTOTYPES
 void display();                //used as callback in glut for display.
@@ -146,6 +155,21 @@ void reshape(int width, int height)        // Resize the OpenGL window
 }
 
 void display() {
+
+    cout << "Current Level : " << currentLevel << endl;
+
+    if(currentLevel == 1){
+        renderLevel1 = true;
+    }
+    else if(currentLevel == 2){
+        renderLevel2 = true;
+    }
+
+    if(clockRunning){
+        timer += 1;
+    }
+
+
     //Clear the colour and depth buffers
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -157,8 +181,6 @@ void display() {
 
     if(renderCountdown){
         renderMenu = false;
-        cout << "Here" << endl;
-        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     if(renderMenu){
@@ -169,9 +191,24 @@ void display() {
 
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.0, 1.0, 0.0));
-
         print(ProjectionMove, font, 20, 20, "Press <Enter> to start");
+
+        ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
+
+        print(ProjectionMove, font, 175, 300, "Go Faster");
+
+        if(bannerX > -200){
+            bannerX = -800;
+        }
+        else{
+            bannerX += 2;
+        }
+
+
+        print(ProjectionMove, font, bannerX, 500, "Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster ");
+
+
+
 
     }
     else if(renderFinish){
@@ -182,11 +219,22 @@ void display() {
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.0, 1.0, 0.0));
 
         if(carFinished){
-            print(ProjectionMove, font, 20, 20, "You Win!");
+            clockRunning = false;
+            storeTime = timer;
+            print(ProjectionMove, font, 320, 500, "You Win!");
+
+            char* char_arr;
+            string str_obj("Your time : " + to_string((float)storeTime/60) + " seconds");
+            char_arr = &str_obj[0];
+
+            print(ProjectionMove, font, 125, 300, char_arr);
+
         }
         else{
-            print(ProjectionMove, font, 20, 20, "You Lose!");
+            print(ProjectionMove, font, 320, 500, "You Lose!");
         }
+        print(ProjectionMove, font, 20, 60, "Press <Enter> to Restart");
+        print(ProjectionMove, font, 20, 20, "Press <Esc> to Exit");
 
 
     }
@@ -196,37 +244,51 @@ void display() {
 
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.0, 1.0, 0.0));
+        ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
         if(countdownCount == 0){
             cout << "Counting Down..." << endl;
         }
         else if(countdownCount == 1){
             cout << "3" << endl;
-            print(ProjectionMove, font, 20, 20, "3");
+
+            print(ProjectionMove, font, 250, 300, "3");
             this_thread::sleep_for(1000ms);
         }
         else if(countdownCount == 2){
             cout << "2" << endl;
-            print(ProjectionMove, font, 20, 20, "2");
+            print(ProjectionMove, font, 250, 300, "2");
             this_thread::sleep_for(1000ms);
         }
         else if(countdownCount == 3){
             cout << "1" << endl;
-            print(ProjectionMove, font, 20, 20, "1");
+            print(ProjectionMove, font, 250, 300, "1");
             this_thread::sleep_for(1000ms);
         }
         else if(countdownCount == 4){
             cout << "GO!" << endl;
-            print(ProjectionMove, font, 20, 20, "GO!");
+            print(ProjectionMove, font, 175, 300, "GO Faster!");
+            this_thread::sleep_for(1000ms);
+        }
+        else if (countdownCount == 5){
             this_thread::sleep_for(1000ms);
             renderCountdown = false;
         }
 
         countdownCount += 1;
+        cout << "Loading Level : " << currentLevel << endl;
 
     }
-    else {
+    else if(renderLevel1){
+
+        clockRunning = true;
+        char* char_arr;
+        string str_obj(to_string((float)timer/60));
+        char_arr = &str_obj[0];
+
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
+
+        glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
         glm::mat4 WallBottomModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(wallBottom.getXPos(),
                                                                                    wallBottom.getYPos(), 0.0));
@@ -247,14 +309,14 @@ void display() {
         if (car.isInCollision(wallBottom.getOBB()) || car.isInCollision(wallRight.getOBB()) ||
             car.isInCollision(wallTop.getOBB()) || car.isInCollision(wallLeft.getOBB())) {
             cout << "Collided" << endl;
-            velocity = -0.5;
+            velocity = 0.5;
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         if (npcCar.isInCollision(wallBottom.getOBB()) || npcCar.isInCollision(wallRight.getOBB()) ||
             npcCar.isInCollision(wallTop.getOBB()) || npcCar.isInCollision(wallLeft.getOBB())) {
             cout << "Collided" << endl;
-            npcVelocity = -0.5;
+            npcVelocity = 0.5;
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
@@ -383,6 +445,232 @@ void display() {
         print(ProjectionMatrix, font, 0, 0, currentAngleStr.c_str());
 
         ProjectionMatrix = StoreProjectionMatrix;
+
+        print(ProjectionMove, font, 20, 20, char_arr);
+    }
+    else if(renderLevel2){
+
+        wallRight.setXpos(250);
+        wallTop.setYpos(365);
+        wallTop.setWidth(250);
+
+        clockRunning = true;
+        char* char_arr;
+        string str_obj(to_string((float)timer/60));
+        char_arr = &str_obj[0];
+
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
+
+        glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+
+        glm::mat4 WallBottomModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(wallBottom.getXPos(),
+                                                                                   wallBottom.getYPos(), 0.0));
+        glm::mat4 WallRightModelViewMatrix = glm::translate(ViewMatrix,
+                                                            glm::vec3(wallRight.getXPos(), wallRight.getYPos(), 0.0));
+        glm::mat4 WallTopModelViewMatrix = glm::translate(ViewMatrix,
+                                                          glm::vec3(wallTop.getXPos(), wallTop.getYPos(), 0.0));
+        glm::mat4 WallLeftModelViewMatrix = glm::translate(ViewMatrix,
+                                                           glm::vec3(wallLeft.getXPos(), wallLeft.getYPos(), 0.0));
+
+
+        wallBottom.Render(shader, WallBottomModelViewMatrix, ProjectionMatrix);
+        wallRight.Render(shader, WallRightModelViewMatrix, ProjectionMatrix);
+        wallTop.Render(shader, WallTopModelViewMatrix, ProjectionMatrix);
+        wallLeft.Render(shader, WallLeftModelViewMatrix, ProjectionMatrix);
+
+
+        if (car.isInCollision(wallBottom.getOBB()) || car.isInCollision(wallRight.getOBB()) ||
+            car.isInCollision(wallTop.getOBB()) || car.isInCollision(wallLeft.getOBB())) {
+            cout << "Collided" << endl;
+            velocity = 0.5;
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
+        if (npcCar.isInCollision(wallBottom.getOBB()) || npcCar.isInCollision(wallRight.getOBB()) ||
+            npcCar.isInCollision(wallTop.getOBB()) || npcCar.isInCollision(wallLeft.getOBB())) {
+            cout << "Collided" << endl;
+            npcVelocity = 0.5;
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
+        //Create a CarModelViewMatrix to transform the car to the correct cornerAngle,y
+        glm::mat4 CarModelViewMatrix = ViewMatrix;
+        CarModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(car.getXPos(), car.getYPos(), 0.0));
+
+        glm::mat4 NpcCarModelViewMatrix = ViewMatrix;
+        NpcCarModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(npcCar.getXPos(), npcCar.getYPos(), 0.0));
+
+        //Set default track position to 0
+        float trackPosition = 0;
+        float cornerAngle = 0;
+        glm::mat4 TrackCornerModelViewMatrix = ViewMatrix;
+
+        //Piece 1
+        trackPosition = 4;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, -10.0, 0.0));
+            float x = (M_PI / 2);
+            TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 1
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(108.0, -10.0, 0.0));
+        cornerAngle = (M_PI);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 2
+        trackPosition = 4;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(108, trackPosition, 0.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 2
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(108.0, 108.0, 0.0));
+        cornerAngle = (0);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 3
+        trackPosition = 122;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 108.0, 0.0));
+            float x = (M_PI / 2);
+            TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 3
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(226.0, 108.0, 0.0));
+        cornerAngle = (M_PI);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 4
+        trackPosition = 122;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(226, trackPosition, 0.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 4
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(226.0, 226.0, 0.0));
+        cornerAngle = (3*M_PI/2);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 5
+        trackPosition = 122;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 226.0, 0.0));
+            float x = (M_PI / 2);
+            TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 5
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(126.0, 226.0, 0.0));
+        cornerAngle = (M_PI/2);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 6
+        trackPosition = 240;
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(126, trackPosition, 0.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 6
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(126.0, 344.0, 0.0));
+        cornerAngle = (3*M_PI/2);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 7
+        trackPosition = 2;
+        for (int i = 0; i < 12; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(trackPosition, 344.0, 0.0));
+            float x = (M_PI / 2);
+            TrackModelViewMatrix = glm::rotate(TrackModelViewMatrix, x, glm::vec3(0.0, 0.0, 1.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 7
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-10.0, 344.0, 0.0));
+        cornerAngle = (0);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+        //Piece 8
+        trackPosition = 0;
+        for (int i = 0; i < 34; i++) {
+            glm::mat4 TrackModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-10, trackPosition, 0.0));
+            trackRight.Render(shader, TrackModelViewMatrix, ProjectionMatrix);
+            trackPosition += 10;
+        }
+
+        //Corner 9
+        TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-10.0, -10.0, 0.0));
+        cornerAngle = (M_PI / 2);
+        TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
+        trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
+
+
+        glm::mat4 StartFinishModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(20.0, -10.0, 1.0));
+        StartFinishModelViewMatrix = glm::rotate(StartFinishModelViewMatrix, (float)M_PI/2, glm::vec3(0.0, 0.0, 1.0));
+        start_finish.Render(shader, StartFinishModelViewMatrix, ProjectionMatrix);
+
+        glm::mat4 MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(220, -10, 0.0));
+        marker1.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, 220, 0.0));
+        marker2.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-20, 200, 0.0));
+        marker3.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, -20, 0.0));
+        marker4.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, -10, 0.0));
+        carMarker1.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, 200, 0.0));
+        carMarker2.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, 200, 0.0));
+        carMarker3.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+        MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, 0, 0.0));
+        carMarker4.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
+
+
+        CarModelViewMatrix = glm::rotate(CarModelViewMatrix, currentAngle, glm::vec3(0.0, 0.0, 1.0));
+
+        NpcCarModelViewMatrix = glm::rotate(NpcCarModelViewMatrix, currentAngleNpc, glm::vec3(0.0, 0.0, 1.0));
+        npcCar.Render(shader, NpcCarModelViewMatrix, ProjectionMatrix);
+
+        car.Render(shader, CarModelViewMatrix, ProjectionMatrix);
+
+        std::string currentAngleStr = std::to_string(currentAngle);
+
+        glm::mat4 StoreProjectionMatrix = ProjectionMatrix;
+
+        ProjectionMatrix = glm::ortho(-25, 25, -25, 25);
+
+        ProjectionMatrix = glm::translate(ProjectionMatrix, glm::vec3(car.getXPos(), car.getYPos(), 0.0));
+
+        //glm::lookAt(glm::vec3(car.getXPos(), car.getYPos(), 0.0), glm::vec3)
+
+        print(ProjectionMatrix, font, 0, 0, currentAngleStr.c_str());
+
+        ProjectionMatrix = StoreProjectionMatrix;
+
+        print(ProjectionMove, font, 20, 20, char_arr);
     }
 
     glDisable(GL_BLEND);
@@ -391,6 +679,9 @@ void display() {
 }
 
 void init() {
+
+    currentLevel = 0;
+    cout << "Current Level : " << currentLevel << endl;
 
     FreeImage_Initialise();
 
@@ -851,7 +1142,29 @@ void processKeys() {
 
 void keyFunction(unsigned char key, int x, int y) {
 
-    switch(key){
+    if(key == 27){
+        glutLeaveMainLoop();
+    }
+    else if(key == 13){
+        renderMenu = false;
+        renderFinish = false;
+        resetGame();
+        renderCountdown = true;
+        countdownCount = 0;
+    }
+    else if(key == 49){
+        currentLevel = 1;
+        cout << "Level 1 Selected" << endl;
+    }
+    else if(key == 50){
+        currentLevel = 2;
+        cout << "Level 2 Selected" << endl;
+    }
+    else{
+        cout << "Default" << endl;
+    }
+
+    /*switch(key){
         //Esc
         case 27:
             glutLeaveMainLoop();
@@ -862,9 +1175,17 @@ void keyFunction(unsigned char key, int x, int y) {
             resetGame();
             renderCountdown = true;
             countdownCount = 0;
+        case 49:
+            currentLevel = 1;
+            cout << "Level 1 Selected" << endl;
+        case 50:
+            currentLevel = 2;
+            cout << "Level 2 Selected" << endl;
         default:
             cout << "Default" << endl;
-    }
+    }*/
+
+    cout << "Current Level : " << currentLevel << endl;
 }
 
 void resetGame() {
@@ -899,9 +1220,15 @@ void resetGame() {
     npcPassed4 = false;
     npcPassed5 = false;
 
+    timer = 0;
+
+    cout << "Current Level : " << currentLevel << endl;
+
 }
 
 void idle() {
+
+    cout << "Current Level : " << currentLevel << endl;
 
     if(renderMenu == false && renderFinish == false){
         //Process key presses for player
