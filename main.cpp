@@ -53,6 +53,8 @@ Square start_finish;
 
 Square innerSquare;
 
+Square arrowKeys;
+
 //Wall objects
 Wall wallBottom;
 Wall wallRight;
@@ -302,13 +304,16 @@ void display() {
 
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 100, 600, "Controls:");
+        print(ProjectionMove, font, 100, 650, "Controls:");
 
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 100, 500, "Press <UP> to Accelerate");
-        print(ProjectionMove, font, 100, 400, "Press <LEFT> or <RIGHT> to Steer");
-        print(ProjectionMove, font, 100, 300, "Press <DOWN> to Brake or Reverse");
+        print(ProjectionMove, font, 100, 550, "Press <UP> to Accelerate");
+        print(ProjectionMove, font, 100, 450, "Press <LEFT> or <RIGHT> to Steer");
+        print(ProjectionMove, font, 100, 350, "Press <DOWN> to Brake or Reverse");
+
+        glm::mat4 ProjectionMatrixKeys = glm::translate(ViewMatrix, glm::vec3(0, -45, 0.0));
+        arrowKeys.Render(shader, ProjectionMatrixKeys, ProjectionMatrix);
     }
     else if(renderFinish){
         glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
@@ -329,7 +334,7 @@ void display() {
             print(ProjectionMove, font, 125, 600, char_arr);
 
             char* char_arr2;
-            string str_obj2("Level : " + to_string((int)MAX_VELOCITY - 2));
+            string str_obj2("TOP SPEED LEVEL : " + to_string((int)MAX_VELOCITY - 2));
             char_arr2 = &str_obj2[0];
 
             print(ProjectionMove, font, 125, 500, char_arr2);
@@ -338,7 +343,7 @@ void display() {
             int startingY = 350;
             for(float & bestScore : bestScores2){
                 char* char_arr;
-                string str_obj(to_string((float)bestScore));
+                string str_obj(to_string((float)bestScore) + " seconds");
                 char_arr = &str_obj[0];
                 print(ProjectionMove, font, 125, startingY, char_arr);
                 startingY -= 80;
@@ -348,7 +353,7 @@ void display() {
         else{
 
             char* char_arr2;
-            string str_obj2("Level : " + to_string((int)MAX_VELOCITY - 2));
+            string str_obj2("TOP SPEED LEVEL : " + to_string((int)MAX_VELOCITY - 2));
             char_arr2 = &str_obj2[0];
 
             print(ProjectionMove, font, 125, 500, char_arr2);
@@ -357,7 +362,7 @@ void display() {
             int startingY = 350;
             for(float & bestScore : bestScores2){
                 char* char_arr;
-                string str_obj(to_string((float)bestScore));
+                string str_obj(to_string((float)bestScore) + " seconds");
                 char_arr = &str_obj[0];
                 print(ProjectionMove, font, 125, startingY, char_arr);
                 startingY -= 80;
@@ -906,6 +911,10 @@ void init() {
     npcCar.SetXpos(10.0f);
     npcCar.SetYpos(-15.0f);
     currentAngleNpc = 3*M_PI/2;
+
+    arrowKeys.setWidth(50);
+    arrowKeys.setHeight(50);
+    arrowKeys.init(shader, red, "keys.png");
 
     wallBottom.setWidth(250.0f);
     wallBottom.setHeight(5.0f);
