@@ -1442,10 +1442,12 @@ void keyFunction(unsigned char key, int x, int y) {
     }
     else if(key == 49){
         currentLevel = 1;
+        renderLevel2 = false;
         cout << "Level 1 Selected" << endl;
     }
     else if(key == 50){
         currentLevel = 2;
+        renderLevel1 = false;
         cout << "Level 2 Selected" << endl;
     }
     else if(key == 99){
