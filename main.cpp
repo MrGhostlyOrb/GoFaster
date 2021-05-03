@@ -25,6 +25,13 @@ using namespace std;
 
 #include <iostream>
 #include <thread>
+#include <irrklang/irrKlang.h>
+#include "conio.h"
+
+using namespace irrklang;
+
+//ISoundEngine* SoundEngine = createIrrKlangDevice();
+//SoundEngine->play2D("firstSound.mp3", true);
 
 using namespace std;
 
@@ -152,6 +159,7 @@ bool renderFinish = false;
 bool renderCountdown = false;
 bool clockRunning = false;
 float bestScores[3];
+std::array<float,3> bestScores2;
 
 int currentLevel = 0;
 bool renderLevel1 = false;
@@ -224,6 +232,8 @@ void display() {
         renderMenu = false;
     }
 
+    cout << to_string(renderLevel2) << endl;
+
     if(renderMenu){
 
         cout << "Rendering Menu" << endl;
@@ -236,18 +246,40 @@ void display() {
 
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 20, 70, "Press <c> to view controls");
+        print(ProjectionMove, font, 20, 70, "Press <C> to view controls");
 
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 220, 250, "Sprint to the finish.");
+        print(ProjectionMove, font, 220, 250, "Race to the finish.");
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 70, 200, "Speed increases every time you win.");
+        print(ProjectionMove, font, 150, 200, "Beat the car to Go Faster.");
 
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
-        print(ProjectionMove, font, 175, 300, "Go Faster");
+        print(ProjectionMove, font, 175, 400, "Go Faster");
+
+        ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+        print(ProjectionMove, font, 70, 475, "Select a track...");
+
+        if(currentLevel == 1){
+            ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+            print(ProjectionMove, font, 70, 425, "<1> Track 1 :EASY: <--");
+
+            ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+            print(ProjectionMove, font, 70, 375, "<2> Track 2 :HARD:");
+        }
+        else if(currentLevel == 2){
+
+            ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+            print(ProjectionMove, font, 70, 425, "<1> Track 1 :EASY:");
+
+            ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+            print(ProjectionMove, font, 70, 375, "<2> Track 2 :HARD: <--");
+        }
+
+
+        ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
         if(bannerX > -200){
             bannerX = -800;
@@ -270,9 +302,13 @@ void display() {
 
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 100, 600, "Press <Up> to Accelerate");
-        print(ProjectionMove, font, 100, 500, "Press <Left> or <Right> to Steer");
-        print(ProjectionMove, font, 100, 400, "Press <Down> to Brake/Reverse");
+        print(ProjectionMove, font, 100, 600, "Press <UP> to Accelerate");
+
+        ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
+
+        print(ProjectionMove, font, 100, 500, "Press <UP> to Accelerate");
+        print(ProjectionMove, font, 100, 400, "Press <LEFT> or <RIGHT> to Steer");
+        print(ProjectionMove, font, 100, 300, "Press <DOWN> to Brake/Reverse");
     }
     else if(renderFinish){
         glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
@@ -284,24 +320,37 @@ void display() {
         if(carFinished){
             clockRunning = false;
             storeTime = timer;
-            print(ProjectionMove, font, 320, 500, "You Win!");
+            print(ProjectionMove, font, 320, 600, "You Win!");
 
             char* char_arr;
             string str_obj("Your time : " + to_string((float)storeTime/60) + " seconds");
             char_arr = &str_obj[0];
 
-            print(ProjectionMove, font, 125, 300, char_arr);
+            print(ProjectionMove, font, 125, 500, char_arr);
 
-            for(float & bestScore : bestScores){
-                if((float)storeTime/60 > bestScore){
-                    bestScore = (float)storeTime/60;
-                    std::sort(bestScores, bestScores + 3, std::greater<>());
-                }
+            print(ProjectionMove, font, 125, 400, "Best Times:");
+            int startingY = 350;
+            for(float & bestScore : bestScores2){
+                char* char_arr;
+                string str_obj(to_string((float)bestScore));
+                char_arr = &str_obj[0];
+                print(ProjectionMove, font, 125, startingY, char_arr);
+                startingY -= 80;
             }
-            print(ProjectionMove, font, 20, 60, "Press <Enter> to Increase Speed");
+            print(ProjectionMove, font, 20, 60, "Press <Enter> to Go Faster");
         }
         else{
-            print(ProjectionMove, font, 320, 500, "You Lose!");
+            print(ProjectionMove, font, 320, 600, "You Lose!");
+            print(ProjectionMove, font, 125, 400, "Best Times:");
+            int startingY = 350;
+            for(float & bestScore : bestScores2){
+                char* char_arr;
+                string str_obj(to_string((float)bestScore));
+                char_arr = &str_obj[0];
+                print(ProjectionMove, font, 125, startingY, char_arr);
+                startingY -= 80;
+            }
+            print(ProjectionMove, font, 20, 60, "Press <Enter> to Restart");
         }
         print(ProjectionMove, font, 20, 20, "Press <Esc> to Exit");
 
@@ -536,6 +585,8 @@ void display() {
         print(ProjectionMove, font, 20, 20, char_arr);
     }
     else if(renderLevel2){
+
+        cout << "Hereeeeeeeeeeeeeeeeee" << endl;
 
         if(car.isInCollision(npcCar.GetOBB())){
             if(velocity > MAX_VELOCITY/4){
@@ -781,7 +832,7 @@ void display() {
         carMarker6.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
         Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, 345, 0.0));
         carMarker7.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
-        Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, -10, 0.0));
+        Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-10, -10, 0.0));
         carMarker8.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
 
         CarModelViewMatrix = glm::rotate(CarModelViewMatrix, currentAngle, glm::vec3(0.0, 0.0, 1.0));
@@ -1057,7 +1108,7 @@ void init() {
     markers[4] = marker5;
 
 
-    font.init("fonts/arialbd.ttf", 30);
+    font.init("fonts/VT323-Regular.ttf", 35);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -1552,6 +1603,43 @@ void checkPlayerCollisions() {
             MAX_VELOCITY = MAX_VELOCITY + 1;
             ACCELERATION += 0.005;
             NPC_ADVANTAGE += 0.1;
+
+            bool swapped = false;
+
+            float storeTime = timer + 1;
+
+            float newScore = (float)storeTime/60;
+
+            if(newScore < bestScores2[0] || bestScores2[0] == 0){
+                std::array<float,3> newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[0] = newScore;
+                newScores[1] = bestScores2[0];
+                newScores[2] = bestScores2[1];
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
+            if(newScore < bestScores2[1] && swapped == false || bestScores2[1] == 0 && swapped == false){
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                std::array<float,3> newScores;
+                newScores[0] = bestScores2[0];
+                newScores[1] = newScore;
+                newScores[2] = bestScores2[1];
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
+            if(newScore < bestScores2[2] && swapped == false || bestScores2[2] == 0 && swapped == false){
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                std::array<float,3> newScores;
+                newScores[0] = bestScores2[0];
+                newScores[1] = bestScores2[1];
+                newScores[2] = newScore;
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
         }
     }
     else if(currentLevel == 2){
@@ -1562,6 +1650,43 @@ void checkPlayerCollisions() {
             MAX_VELOCITY = MAX_VELOCITY + 1;
             ACCELERATION += 0.005;
             NPC_ADVANTAGE += 0.1;
+
+            bool swapped = false;
+
+            float storeTime = timer + 1;
+
+            float newScore = (float)storeTime/60;
+
+            if(newScore < bestScores2[0] || bestScores2[0] == 0){
+                std::array<float,3> newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[0] = newScore;
+                newScores[1] = bestScores2[0];
+                newScores[2] = bestScores2[1];
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
+            if(newScore < bestScores2[1] && swapped == false || bestScores2[1] == 0 && swapped == false){
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                std::array<float,3> newScores;
+                newScores[0] = bestScores2[0];
+                newScores[1] = newScore;
+                newScores[2] = bestScores2[1];
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
+            if(newScore < bestScores2[2] && swapped == false || bestScores2[2] == 0 && swapped == false){
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                std::array<float,3> newScores;
+                newScores[0] = bestScores2[0];
+                newScores[1] = bestScores2[1];
+                newScores[2] = newScore;
+                bestScores2 = newScores;
+                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                swapped = true;
+            }
         }
     }
 
@@ -1640,6 +1765,8 @@ void processNpc() {
     //M_PI/2 = Left
     //0 = Up
     //3*M_PI/2 = Right
+
+    cout << "Current Level : " << currentLevel << endl;
 
     if(currentLevel == 1){
         if(npcCollisionCount == 0){
