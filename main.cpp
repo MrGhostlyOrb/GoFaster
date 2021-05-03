@@ -109,7 +109,7 @@ float npcVelocity = 0;
 bool npcIsReversing = false;
 
 //Speed and other modifiers
-const float TURNING_SPEED = 0.4;
+const float TURNING_SPEED = 0.6;
 float MAX_VELOCITY = 2;
 const float ORTHO = 25;
 const float ZOOM = 3;
@@ -253,7 +253,7 @@ void display() {
         print(ProjectionMove, font, 220, 250, "Race to the finish.");
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 150, 200, "Beat the car to Go Faster.");
+        print(ProjectionMove, font, 100, 200, "Beat the PURPLE car to Go Faster.");
 
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
@@ -302,13 +302,13 @@ void display() {
 
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
-        print(ProjectionMove, font, 100, 600, "Press <UP> to Accelerate");
+        print(ProjectionMove, font, 100, 600, "Controls:");
 
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
         print(ProjectionMove, font, 100, 500, "Press <UP> to Accelerate");
         print(ProjectionMove, font, 100, 400, "Press <LEFT> or <RIGHT> to Steer");
-        print(ProjectionMove, font, 100, 300, "Press <DOWN> to Brake/Reverse");
+        print(ProjectionMove, font, 100, 300, "Press <DOWN> to Brake or Reverse");
     }
     else if(renderFinish){
         glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
@@ -320,13 +320,19 @@ void display() {
         if(carFinished){
             clockRunning = false;
             storeTime = timer;
-            print(ProjectionMove, font, 320, 600, "You Win!");
+            print(ProjectionMove, font, 320, 700, "You Win!");
 
             char* char_arr;
             string str_obj("Your time : " + to_string((float)storeTime/60) + " seconds");
             char_arr = &str_obj[0];
 
-            print(ProjectionMove, font, 125, 500, char_arr);
+            print(ProjectionMove, font, 125, 600, char_arr);
+
+            char* char_arr2;
+            string str_obj2("Level : " + to_string((int)MAX_VELOCITY - 2));
+            char_arr2 = &str_obj2[0];
+
+            print(ProjectionMove, font, 125, 500, char_arr2);
 
             print(ProjectionMove, font, 125, 400, "Best Times:");
             int startingY = 350;
@@ -340,7 +346,13 @@ void display() {
             print(ProjectionMove, font, 20, 60, "Press <Enter> to Go Faster");
         }
         else{
-            print(ProjectionMove, font, 320, 600, "You Lose!");
+
+            char* char_arr2;
+            string str_obj2("Level : " + to_string((int)MAX_VELOCITY - 2));
+            char_arr2 = &str_obj2[0];
+
+            print(ProjectionMove, font, 125, 500, char_arr2);
+            print(ProjectionMove, font, 320, 700, "You Lose!");
             print(ProjectionMove, font, 125, 400, "Best Times:");
             int startingY = 350;
             for(float & bestScore : bestScores2){
@@ -352,6 +364,7 @@ void display() {
             }
             print(ProjectionMove, font, 20, 60, "Press <Enter> to Restart");
         }
+        print(ProjectionMove, font, 20, 100, "Press <M> to return to Menu");
         print(ProjectionMove, font, 20, 20, "Press <Esc> to Exit");
 
 
@@ -866,7 +879,7 @@ void display() {
 
 void init() {
 
-    currentLevel = 0;
+    currentLevel = 1;
     cout << "Current Level : " << currentLevel << endl;
 
     FreeImage_Initialise();
@@ -957,7 +970,7 @@ void init() {
 
     start_finish.setWidth(19.0f);
     start_finish.setHeight(19.0f/2);
-    start_finish.init(shader, red, "tribune_overhang_striped.png");
+    start_finish.init(shader, red, "start_finish.png");
 
     wallBottom.init(shader, red, "roadTexture_26.png");
     wallRight.init(shader, red, "roadTexture_26.png");
@@ -970,7 +983,7 @@ void init() {
     wallLeft_2.init(shader, red, "roadTexture_26.png");
 
     car.init(shader, red, "car.png");
-    npcCar.init(shader, red, "car.png");
+    npcCar.init(shader, red, "npc.png");
     trackUp.init(shader, blue, "roadTexture_84.png");
     trackRight.init(shader, blue, "roadTexture_84.png");
 
@@ -1016,27 +1029,27 @@ void init() {
     marker8.SetXPos(0);
     marker8.SetYPos(0);
 
-    carMarker1.setWidth(20);
-    carMarker1.setHeight(20);
+    carMarker1.setWidth(40);
+    carMarker1.setHeight(40);
 
-    carMarker2.setWidth(20);
-    carMarker2.setHeight(20);
+    carMarker2.setWidth(40);
+    carMarker2.setHeight(40);
 
-    carMarker3.setWidth(20);
-    carMarker3.setHeight(20);
+    carMarker3.setWidth(40);
+    carMarker3.setHeight(40);
 
-    carMarker4.setWidth(20);
-    carMarker4.setHeight(20);
+    carMarker4.setWidth(40);
+    carMarker4.setHeight(40);
 
-    carMarker5.setWidth(20);
-    carMarker5.setHeight(20);
+    carMarker5.setWidth(40);
+    carMarker5.setHeight(40);
 
-    carMarker6.setWidth(20);
-    carMarker6.setHeight(20);
-    carMarker7.setWidth(20);
-    carMarker7.setHeight(20);
-    carMarker8.setWidth(20);
-    carMarker8.setHeight(20);
+    carMarker6.setWidth(40);
+    carMarker6.setHeight(40);
+    carMarker7.setWidth(40);
+    carMarker7.setHeight(40);
+    carMarker8.setWidth(40);
+    carMarker8.setHeight(40);
 
 
     carMarker1.SetXPos(0);
@@ -1074,23 +1087,23 @@ void init() {
     npcMarker8.setHeight(20);
 
 
-    marker1.init(shader, red, "roadTexture_26.png");
-    marker2.init(shader, red, "roadTexture_26.png");
-    marker3.init(shader, red, "roadTexture_26.png");
-    marker4.init(shader, red, "roadTexture_26.png");
-    marker5.init(shader, red, "roadTexture_26.png");
-    marker6.init(shader, red, "roadTexture_26.png");
-    marker7.init(shader, red, "roadTexture_26.png");
-    marker8.init(shader, red, "roadTexture_26.png");
+    marker1.init(shader, red, "transparent.png");
+    marker2.init(shader, red, "transparent.png");
+    marker3.init(shader, red, "transparent.png");
+    marker4.init(shader, red, "transparent.png");
+    marker5.init(shader, red, "transparent.png");
+    marker6.init(shader, red, "transparent.png");
+    marker7.init(shader, red, "transparent.png");
+    marker8.init(shader, red, "transparent.png");
 
-    carMarker1.init(shader, red, "tribune_overhang_striped.png");
-    carMarker2.init(shader, red, "tribune_overhang_striped.png");
-    carMarker3.init(shader, red, "tribune_overhang_striped.png");
-    carMarker4.init(shader, red, "tribune_overhang_striped.png");
-    carMarker5.init(shader, red, "tribune_overhang_striped.png");
-    carMarker6.init(shader, red, "tribune_overhang_striped.png");
-    carMarker7.init(shader, red, "tribune_overhang_striped.png");
-    carMarker8.init(shader, red, "tribune_overhang_striped.png");
+    carMarker1.init(shader, red, "transparent.png");
+    carMarker2.init(shader, red, "transparent.png");
+    carMarker3.init(shader, red, "transparent.png");
+    carMarker4.init(shader, red, "transparent.png");
+    carMarker5.init(shader, red, "transparent.png");
+    carMarker6.init(shader, red, "transparent.png");
+    carMarker7.init(shader, red, "transparent.png");
+    carMarker8.init(shader, red, "transparent.png");
 
     npcMarker1.init(shader, red, "roadTexture_26.png");
     npcMarker2.init(shader, red, "roadTexture_26.png");
@@ -1449,6 +1462,13 @@ void keyFunction(unsigned char key, int x, int y) {
         currentLevel = 2;
         renderLevel1 = false;
         cout << "Level 2 Selected" << endl;
+    }
+    else if(key == 109){
+        renderLevel1 = false;
+        renderLevel2 = false;
+        resetGame();
+        renderControlMenu = false;
+        renderMenu = true;
     }
     else if(key == 99){
         cout << "Pressed Control Button" << endl;
