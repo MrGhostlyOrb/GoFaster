@@ -35,13 +35,20 @@ using namespace irrklang;
 
 using namespace std;
 
-glm::mat4 ViewMatrix;  // matrix for the modelling and viewing
-glm::mat4 ProjectionMatrix; // matrix for the orthographic projection
-int screenWidth = 800, screenHeight = 800;
+//Matrix for the modelling and viewing
+glm::mat4 ViewMatrix;
 
+//Matrix for the orthographic projection
+glm::mat4 ProjectionMatrix;
+
+//Variable for screen width and height
+int screenWidth = 800;
+int screenHeight = 800;
+
+//Object to store shader
 Shader shader;
 
-//Car object
+//Car and NPC object
 Car car;
 Car npcCar;
 
@@ -51,8 +58,7 @@ Square trackRight;
 Square trackCorner;
 Square start_finish;
 
-Square innerSquare;
-
+//Object to render controls
 Square arrowKeys;
 
 //Wall objects
@@ -61,17 +67,18 @@ Wall wallRight;
 Wall wallTop;
 Wall wallLeft;
 
+//Wall object for level 2
 Wall wallBottom_2;
 Wall wallRight_2;
 Wall wallTop_2;
 Wall wallLeft_2;
 
+//Inner wall objects for both levels
 Wall innerWall;
 Wall innerWall_2;
 Wall innerWall_3;
 
-const int markersSize = 5;
-Marker markers[markersSize];
+//Markers for track navigation for NPC
 Marker marker1;
 Marker marker2;
 Marker marker3;
@@ -81,6 +88,7 @@ Marker marker6;
 Marker marker7;
 Marker marker8;
 
+//Markers for track navigation for player
 Marker carMarker1;
 Marker carMarker2;
 Marker carMarker3;
@@ -90,33 +98,23 @@ Marker carMarker6;
 Marker carMarker7;
 Marker carMarker8;
 
-Marker npcMarker1;
-Marker npcMarker2;
-Marker npcMarker3;
-Marker npcMarker4;
-Marker npcMarker5;
-Marker npcMarker6;
-Marker npcMarker7;
-Marker npcMarker8;
-
 freetype::Font font;
 
 //Initialising global variables
 float currentAngle = 0.2;
 float currentAngleNpc = 0.1;
-float npcTargetAngle = 0;
 bool isReversing = false;
 float velocity = 0;
 float npcVelocity = 0;
-bool npcIsReversing = false;
+
 
 //Speed and other modifiers
 const float TURNING_SPEED = 0.6;
 float MAX_VELOCITY = 2;
 const float ORTHO = 25;
 const float ZOOM = 3;
-float ACCELERATION = 0.01;
-float NPC_ADVANTAGE = 1.5;
+float ACCELERATION = 0.001;
+float NPC_ADVANTAGE = 2;
 float COLLISION_SPEED = 0.5;
 
 //Ortho assignments
@@ -131,6 +129,7 @@ bool keyRight = false;
 bool keyUp = false;
 bool keyDown = false;
 
+//Keeping track of lap progress
 bool passed1 = false;
 bool passed2 = false;
 bool passed3 = false;
@@ -140,6 +139,7 @@ bool passed6 = false;
 bool passed7 = false;
 bool passed8 = false;
 
+//Keeping track of lap progress for NPC
 bool npcPassed1 = false;
 bool npcPassed2 = false;
 bool npcPassed3 = false;
@@ -149,6 +149,7 @@ bool npcPassed6 = false;
 bool npcPassed7 = false;
 bool npcPassed8 = false;
 
+//Check for the start/finish line
 bool passedStart = false;
 bool npcPassedStart = false;
 
@@ -160,69 +161,76 @@ bool carFinished = false;
 bool renderFinish = false;
 bool renderCountdown = false;
 bool clockRunning = false;
-float bestScores[3];
-std::array<float,3> bestScores2;
+std::array<float, 3> scoresArray;
 
+//Current level and rendering level controls
 int currentLevel = 0;
 bool renderLevel1 = false;
 bool renderLevel2 = false;
 
+//Collision counts for tracking progress
 int npcCollisionCount = 0;
 int carCollisionCount = 0;
 
+//Timer variables
 int countdownCount = 0;
 int timer = 0;
 int storeTime = 0;
 
+//Banner scrolling
 int bannerX = 0;
 
 //OPENGL FUNCTION PROTOTYPES
-void display();                //used as callback in glut for display.
-void reshape(int width, int height); //used as callback for reshape function in glut
-void init();                //called in main when the program starts.
+//Used as callback in glut for display.
+void display();
 
+//Used as callback for reshape function in glut
+void reshape(int width, int height);
+
+//Called in main when the program starts.
+void init();
+
+//Process the movement around the track and collisions for the NPC
 void processNpc();
 
-float calculateDistance(float x, float y);
-
-void moveToMarker();
-
+//Process player collisions while opn the track
 void checkPlayerCollisions();
 
+//Reset all main game variables
 void resetGame();
 
 /*************    START OF OPENGL FUNCTIONS   ****************/
 
-void reshape(int width, int height)        // Resize the OpenGL window
-{
+//Resize the OpenGL window
+void reshape(int width, int height) {
+    //Set the screen width and height
     screenWidth = width;
     screenHeight = height;
 
-    glViewport(0, 0, width, height);                        // set Viewport dimensions
+    //Set Viewport dimensions
+    glViewport(0, 0, width, height);
 
     //Set default coordinate system
     ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
 }
 
+//Function for rendering to window
 void display() {
 
-    cout << "Current Level : " << currentLevel << endl;
-
-    if(currentLevel == 1){
+    //Check which level should be rendered
+    if (currentLevel == 1) {
         renderLevel1 = true;
-    }
-    else if(currentLevel == 2){
+    } else if (currentLevel == 2) {
         renderLevel2 = true;
     }
 
-    if(clockRunning){
+    //Increment the clock for the timer
+    if (clockRunning) {
         timer += 1;
     }
 
-
     //Clear the colour and depth buffers
     glClear(GL_COLOR_BUFFER_BIT);
-
 
     //Enable blend before rendering
     glEnable(GL_BLEND);
@@ -230,218 +238,205 @@ void display() {
     //Create a ViewMatrix with the identity matrix
     ViewMatrix = glm::translate(glm::mat4(1.0), glm::vec3(0.0, 0.0, 0.0));
 
-    if(renderCountdown || renderControlMenu){
+    //Check if the countdown or control menu are being rendered
+    if (renderCountdown || renderControlMenu) {
         renderMenu = false;
     }
 
-    cout << to_string(renderLevel2) << endl;
-
-    if(renderMenu){
-
+    //If else statement to render a particular menu/level
+    if (renderMenu) {
         cout << "Rendering Menu" << endl;
 
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
-
+        //Render the main menu text
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 20, 20, "Press <Enter> to start");
-
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 20, 70, "Press <C> to view controls");
-
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 220, 250, "Race to the finish.");
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 100, 200, "Beat the PURPLE car to Go Faster.");
-
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
-
         print(ProjectionMove, font, 175, 400, "Go Faster");
-
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
         print(ProjectionMove, font, 70, 475, "Select a track...");
 
-        if(currentLevel == 1){
+        //Render text based on level selection
+        if (currentLevel == 1) {
             ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
             print(ProjectionMove, font, 70, 425, "<1> Track 1 :EASY: <--");
-
             ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
             print(ProjectionMove, font, 70, 375, "<2> Track 2 :HARD:");
-        }
-        else if(currentLevel == 2){
-
+        } else if (currentLevel == 2) {
             ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
             print(ProjectionMove, font, 70, 425, "<1> Track 1 :EASY:");
-
             ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
             print(ProjectionMove, font, 70, 375, "<2> Track 2 :HARD: <--");
         }
 
-
+        //Scaler for the banner text
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
-        if(bannerX > -200){
+        //Scrolling banner logic
+        if (bannerX > -200) {
             bannerX = -800;
-        }
-        else{
+        } else {
             bannerX += 2;
         }
 
-
-        print(ProjectionMove, font, bannerX, 500, "Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster ");
-
-
-
-
-    }
-    else if(renderControlMenu){
+        //Display banner on window
+        print(ProjectionMove, font, bannerX, 500,
+              "Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster Go Faster ");
+    } else if (renderControlMenu) {
         cout << "Rendering Control Menu" << endl;
 
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
-
+        //Render text for control menu
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 100, 650, "Controls:");
-
         ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         print(ProjectionMove, font, 100, 550, "Press <UP> to Accelerate");
         print(ProjectionMove, font, 100, 450, "Press <LEFT> or <RIGHT> to Steer");
         print(ProjectionMove, font, 100, 350, "Press <DOWN> to Brake or Reverse");
 
+        //Render the image of controls
         glm::mat4 ProjectionMatrixKeys = glm::translate(ViewMatrix, glm::vec3(0, -45, 0.0));
         arrowKeys.Render(shader, ProjectionMatrixKeys, ProjectionMatrix);
-    }
-    else if(renderFinish){
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
+    } else if (renderFinish) {
 
+        //Render the text for the finish screen
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.0, 1.0, 0.0));
 
-        if(carFinished){
+        //Check whether player won or lost the race
+        if (carFinished) {
+            //Stop the clock and store value
             clockRunning = false;
             storeTime = timer;
             print(ProjectionMove, font, 320, 700, "You Win!");
 
-            char* char_arr;
-            string str_obj("Your time : " + to_string((float)storeTime/60) + " seconds");
-            char_arr = &str_obj[0];
+            //Render the player's time
+            char *timeDisplay;
+            string timeString("Your time : " + to_string((float) storeTime / 60) + " seconds");
+            timeDisplay = &timeString[0];
+            print(ProjectionMove, font, 125, 600, timeDisplay);
 
-            print(ProjectionMove, font, 125, 600, char_arr);
+            //Render the current level of the player
+            char *speedLevel;
+            string speedLevelString("TOP SPEED LEVEL : " + to_string((int) MAX_VELOCITY - 2));
+            speedLevel = &speedLevelString[0];
+            print(ProjectionMove, font, 125, 500, speedLevel);
 
-            char* char_arr2;
-            string str_obj2("TOP SPEED LEVEL : " + to_string((int)MAX_VELOCITY - 2));
-            char_arr2 = &str_obj2[0];
-
-            print(ProjectionMove, font, 125, 500, char_arr2);
-
+            //Render the top 3 times of the player
             print(ProjectionMove, font, 125, 400, "Best Times:");
             int startingY = 350;
-            for(float & bestScore : bestScores2){
-                char* char_arr;
-                string str_obj(to_string((float)bestScore) + " seconds");
+            for (float &bestScore : scoresArray) {
+                char *char_arr;
+                string str_obj(to_string((float) bestScore) + " seconds");
                 char_arr = &str_obj[0];
                 print(ProjectionMove, font, 125, startingY, char_arr);
                 startingY -= 80;
             }
             print(ProjectionMove, font, 20, 60, "Press <Enter> to Go Faster");
-        }
-        else{
+        } else {
+            //Case for if the player loses
 
-            char* char_arr2;
-            string str_obj2("TOP SPEED LEVEL : " + to_string((int)MAX_VELOCITY - 2));
+            //Render the player's level
+            char *char_arr2;
+            string str_obj2("TOP SPEED LEVEL : " + to_string((int) MAX_VELOCITY - 2));
             char_arr2 = &str_obj2[0];
 
+            //Render lose text
             print(ProjectionMove, font, 125, 500, char_arr2);
             print(ProjectionMove, font, 320, 700, "You Lose!");
+
+            //Render player's losing time
             print(ProjectionMove, font, 125, 400, "Best Times:");
             int startingY = 350;
-            for(float & bestScore : bestScores2){
-                char* char_arr;
-                string str_obj(to_string((float)bestScore) + " seconds");
+            for (float &bestScore : scoresArray) {
+                char *char_arr;
+                string str_obj(to_string((float) bestScore) + " seconds");
                 char_arr = &str_obj[0];
                 print(ProjectionMove, font, 125, startingY, char_arr);
                 startingY -= 80;
             }
             print(ProjectionMove, font, 20, 60, "Press <Enter> to Restart");
         }
+
+        //Print menu text
         print(ProjectionMove, font, 20, 100, "Press <M> to return to Menu");
         print(ProjectionMove, font, 20, 20, "Press <Esc> to Exit");
 
+    } else if (renderCountdown) {
 
-    }
-    else if(renderCountdown){
-
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
-
+        //Render countdown text
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
-
         ProjectionMove = glm::scale(ProjectionMove, glm::vec3(1.5, 1.5, 0.0));
 
-        if(countdownCount == 0){
+        //Increment after each slow frame (1s)
+        if (countdownCount == 0) {
             cout << "Counting Down..." << endl;
-        }
-        else if(countdownCount == 1){
+        } else if (countdownCount == 1) {
             cout << "3" << endl;
-
             print(ProjectionMove, font, 250, 300, "3");
             this_thread::sleep_for(1000ms);
-        }
-        else if(countdownCount == 2){
+        } else if (countdownCount == 2) {
             cout << "2" << endl;
             print(ProjectionMove, font, 250, 300, "2");
             this_thread::sleep_for(1000ms);
-        }
-        else if(countdownCount == 3){
+        } else if (countdownCount == 3) {
             cout << "1" << endl;
             print(ProjectionMove, font, 250, 300, "1");
             this_thread::sleep_for(1000ms);
-        }
-        else if(countdownCount == 4){
+        } else if (countdownCount == 4) {
             cout << "GO!" << endl;
             print(ProjectionMove, font, 175, 300, "GO Faster!");
             this_thread::sleep_for(1000ms);
-        }
-        else if (countdownCount == 5){
+        } else if (countdownCount == 5) {
             this_thread::sleep_for(1000ms);
+
+            //Stop rendering the countdown
             renderCountdown = false;
         }
 
+        //Add to countdown
         countdownCount += 1;
-        cout << "Loading Level : " << currentLevel << endl;
 
-    }
-    else if(renderLevel1){
+    } else if (renderLevel1) {
+        //Case for rendering the first level
 
-        if(car.isInCollision(npcCar.GetOBB())){
-            if(velocity > MAX_VELOCITY/4){
+        //Check for collisions between the car and NPC
+        if (car.isInCollision(npcCar.GetOBB())) {
+            if (velocity > MAX_VELOCITY / 4) {
                 velocity -= 0.1;
             }
-            if(npcVelocity > MAX_VELOCITY/4){
+            if (npcVelocity > MAX_VELOCITY / 4) {
                 npcVelocity -= 0.1;
             }
         }
 
-        if(car.isInCollision(innerWall.getOBB())){
+        //Check if the player car is colliding with the inner walls
+        if (car.isInCollision(innerWall.getOBB())) {
             velocity = COLLISION_SPEED;
         }
-        if(npcCar.isInCollision(innerWall.getOBB())){
+        if (npcCar.isInCollision(innerWall.getOBB())) {
             npcVelocity = COLLISION_SPEED;
         }
 
+        //Start the clock
         clockRunning = true;
-        char* char_arr;
-        string str_obj(to_string((float)timer/60));
+
+        char *char_arr;
+        string str_obj(to_string((float) timer / 60));
         char_arr = &str_obj[0];
 
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
-
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
+        //Render walls
         glm::mat4 WallBottomModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(wallBottom.getXPos(),
                                                                                    wallBottom.getYPos(), 0.0));
         glm::mat4 WallRightModelViewMatrix = glm::translate(ViewMatrix,
@@ -451,25 +446,23 @@ void display() {
         glm::mat4 WallLeftModelViewMatrix = glm::translate(ViewMatrix,
                                                            glm::vec3(wallLeft.getXPos(), wallLeft.getYPos(), 0.0));
 
-
         wallBottom.Render(shader, WallBottomModelViewMatrix, ProjectionMatrix);
         wallRight.Render(shader, WallRightModelViewMatrix, ProjectionMatrix);
         wallTop.Render(shader, WallTopModelViewMatrix, ProjectionMatrix);
         wallLeft.Render(shader, WallLeftModelViewMatrix, ProjectionMatrix);
 
-
+        //Check for collisions with the player and the walls
         if (car.isInCollision(wallBottom.getOBB()) || car.isInCollision(wallRight.getOBB()) ||
             car.isInCollision(wallTop.getOBB()) || car.isInCollision(wallLeft.getOBB())) {
             cout << "Collided" << endl;
             velocity = COLLISION_SPEED;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
+        //Check for collisions between the NPC and the walls
         if (npcCar.isInCollision(wallBottom.getOBB()) || npcCar.isInCollision(wallRight.getOBB()) ||
             npcCar.isInCollision(wallTop.getOBB()) || npcCar.isInCollision(wallLeft.getOBB())) {
             cout << "Collided" << endl;
             npcVelocity = COLLISION_SPEED;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         //Create a CarModelViewMatrix to transform the car to the correct cornerAngle,y
@@ -532,7 +525,7 @@ void display() {
         }
 
         TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(208.0, 204.0, 0.0));
-        cornerAngle = (3* M_PI/2 );
+        cornerAngle = (3 * M_PI / 2);
         TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
@@ -555,9 +548,11 @@ void display() {
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
         glm::mat4 StartFinishModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(20.0, -10.0, 1.0));
-        StartFinishModelViewMatrix = glm::rotate(StartFinishModelViewMatrix, (float)M_PI/2, glm::vec3(0.0, 0.0, 1.0));
+        StartFinishModelViewMatrix = glm::rotate(StartFinishModelViewMatrix, (float) M_PI / 2,
+                                                 glm::vec3(0.0, 0.0, 1.0));
         start_finish.Render(shader, StartFinishModelViewMatrix, ProjectionMatrix);
 
+        //Render markers for lap progress for NPC
         glm::mat4 MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(220, -10, 0.0));
         marker1.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
         MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, 220, 0.0));
@@ -567,6 +562,7 @@ void display() {
         MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(0, -20, 0.0));
         marker4.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
 
+        //Render markers for lap progress for Player
         MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, -10, 0.0));
         carMarker1.Render(shader, MarkerModelViewMatrix, ProjectionMatrix);
         MarkerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(200, 200, 0.0));
@@ -594,49 +590,39 @@ void display() {
 
         ProjectionMatrix = glm::translate(ProjectionMatrix, glm::vec3(car.getXPos(), car.getYPos(), 0.0));
 
-        //glm::lookAt(glm::vec3(car.getXPos(), car.getYPos(), 0.0), glm::vec3)
-
         print(ProjectionMatrix, font, 0, 0, currentAngleStr.c_str());
 
         ProjectionMatrix = StoreProjectionMatrix;
 
         print(ProjectionMove, font, 20, 20, char_arr);
-    }
-    else if(renderLevel2){
+    } else if (renderLevel2) {
 
-        cout << "Hereeeeeeeeeeeeeeeeee" << endl;
-
-        if(car.isInCollision(npcCar.GetOBB())){
-            if(velocity > MAX_VELOCITY/4){
+        //Check for collisions between player and NPC
+        if (car.isInCollision(npcCar.GetOBB())) {
+            if (velocity > MAX_VELOCITY / 4) {
                 velocity -= 0.1;
             }
-            if(npcVelocity > MAX_VELOCITY/4){
+            if (npcVelocity > MAX_VELOCITY / 4) {
                 npcVelocity -= 0.1;
             }
         }
 
-        /*if(car.isInCollision(innerWall.getOBB())){
-            velocity = 0.5;
-        }
-        if(npcCar.isInCollision(innerWall.getOBB())){
-            npcVelocity = 0.5;
-        }*/
-
-        //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
+        //Start the clock
         clockRunning = true;
-        char* char_arr;
-        string str_obj(to_string((float)timer/60));
+
+        char *char_arr;
+        string str_obj(to_string((float) timer / 60));
         char_arr = &str_obj[0];
 
-        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float)screenWidth, 1.0f, (float)screenHeight);
-
+        glm::mat4 FontProjectionMatrix = glm::ortho(1.0f, (float) screenWidth, 1.0f, (float) screenHeight);
         glm::mat4 ProjectionMove = glm::translate(FontProjectionMatrix, glm::vec3(0.0, 0.0, 0.0));
 
+        //Render walls for the second level
         glm::mat4 WallBottomModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(wallBottom_2.getXPos(),
                                                                                    wallBottom_2.getYPos(), 0.0));
         glm::mat4 WallRightModelViewMatrix = glm::translate(ViewMatrix,
-                                                            glm::vec3(wallRight_2.getXPos(), wallRight_2.getYPos(), 0.0));
+                                                            glm::vec3(wallRight_2.getXPos(), wallRight_2.getYPos(),
+                                                                      0.0));
         glm::mat4 WallTopModelViewMatrix = glm::translate(ViewMatrix,
                                                           glm::vec3(wallTop_2.getXPos(), wallTop_2.getYPos(), 0.0));
         glm::mat4 WallLeftModelViewMatrix = glm::translate(ViewMatrix,
@@ -648,38 +634,39 @@ void display() {
         wallTop_2.Render(shader, WallTopModelViewMatrix, ProjectionMatrix);
         wallLeft_2.Render(shader, WallLeftModelViewMatrix, ProjectionMatrix);
 
+        //Render the inner wall for the second level
         glm::mat4 WallModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(50, 165, 0.0));
         innerWall_2.Render(shader, WallModelViewMatrix, ProjectionMatrix);
 
-        if(car.isInCollision(innerWall_2.getOBB())){
+        //Check for collisions between NPC, Player and inner walls
+        if (car.isInCollision(innerWall_2.getOBB())) {
             velocity = COLLISION_SPEED;
         }
-        if(npcCar.isInCollision(innerWall_2.getOBB())){
+        if (npcCar.isInCollision(innerWall_2.getOBB())) {
             npcVelocity = COLLISION_SPEED;
         }
 
         WallModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(133, 167, 0.0));
         innerWall_3.Render(shader, WallModelViewMatrix, ProjectionMatrix);
 
-        if(car.isInCollision(innerWall_3.getOBB())){
+        if (car.isInCollision(innerWall_3.getOBB())) {
             velocity = COLLISION_SPEED;
         }
-        if(npcCar.isInCollision(innerWall_3.getOBB())){
+        if (npcCar.isInCollision(innerWall_3.getOBB())) {
             npcVelocity = COLLISION_SPEED;
         }
 
+        //Check for collisions between car and player with walls
         if (car.isInCollision(wallBottom_2.getOBB()) || car.isInCollision(wallRight_2.getOBB()) ||
             car.isInCollision(wallTop_2.getOBB()) || car.isInCollision(wallLeft_2.getOBB())) {
             cout << "Collided" << endl;
             velocity = COLLISION_SPEED;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         if (npcCar.isInCollision(wallBottom_2.getOBB()) || npcCar.isInCollision(wallRight_2.getOBB()) ||
             npcCar.isInCollision(wallTop_2.getOBB()) || npcCar.isInCollision(wallLeft_2.getOBB())) {
             cout << "Collided" << endl;
             npcVelocity = COLLISION_SPEED;
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         //Create a CarModelViewMatrix to transform the car to the correct cornerAngle,y
@@ -750,7 +737,7 @@ void display() {
 
         //Corner 4
         TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(226.0, 226.0, 0.0));
-        cornerAngle = (3*M_PI/2);
+        cornerAngle = (3 * M_PI / 2);
         TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
@@ -766,7 +753,7 @@ void display() {
 
         //Corner 5
         TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(126.0, 226.0, 0.0));
-        cornerAngle = (M_PI/2);
+        cornerAngle = (M_PI / 2);
         TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
@@ -780,7 +767,7 @@ void display() {
 
         //Corner 6
         TrackCornerModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(126.0, 344.0, 0.0));
-        cornerAngle = (3*M_PI/2);
+        cornerAngle = (3 * M_PI / 2);
         TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
@@ -814,11 +801,13 @@ void display() {
         TrackCornerModelViewMatrix = glm::rotate(TrackCornerModelViewMatrix, cornerAngle, glm::vec3(0.0, 0.0, 1.0));
         trackCorner.Render(shader, TrackCornerModelViewMatrix, ProjectionMatrix);
 
-
+        //Render the start/finish line
         glm::mat4 StartFinishModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(20.0, -10.0, 1.0));
-        StartFinishModelViewMatrix = glm::rotate(StartFinishModelViewMatrix, (float)M_PI/2, glm::vec3(0.0, 0.0, 1.0));
+        StartFinishModelViewMatrix = glm::rotate(StartFinishModelViewMatrix, (float) M_PI / 2,
+                                                 glm::vec3(0.0, 0.0, 1.0));
         start_finish.Render(shader, StartFinishModelViewMatrix, ProjectionMatrix);
 
+        //Markers for the NPC's progression
         glm::mat4 Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(120, -10, 0.0));//
         marker1.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
         Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(105, 125, 0.0));//
@@ -836,6 +825,7 @@ void display() {
         Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(-10, -20, 0.0));
         marker8.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
 
+        //Markers for the player's progression
         Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(100, -10, 0.0));//
         carMarker1.Render(shader, Marker2ModelViewMatrix, ProjectionMatrix);
         Marker2ModelViewMatrix = glm::translate(ViewMatrix, glm::vec3(125, 110, 0.0));//
@@ -868,8 +858,6 @@ void display() {
 
         ProjectionMatrix = glm::translate(ProjectionMatrix, glm::vec3(car.getXPos(), car.getYPos(), 0.0));
 
-        //glm::lookAt(glm::vec3(car.getXPos(), car.getYPos(), 0.0), glm::vec3)
-
         print(ProjectionMatrix, font, 0, 0, currentAngleStr.c_str());
 
         ProjectionMatrix = StoreProjectionMatrix;
@@ -877,45 +865,55 @@ void display() {
         print(ProjectionMove, font, 20, 20, char_arr);
     }
 
+    //Disable blend after rendering
     glDisable(GL_BLEND);
 
     glutSwapBuffers();
 }
 
 void init() {
+    //Init function called at beginning of execution
 
+    //Set the default level selection
     currentLevel = 1;
-    cout << "Current Level : " << currentLevel << endl;
 
+    //Initialize FreeImage
     FreeImage_Initialise();
 
-    glClearColor(0.4, 0.3, 0.2, 0.2);                        //sets the clear colour to black
+    //Set the main background colour
+    glClearColor(0.4, 0.3, 0.2, 0.2);
 
     //Load the GLSL program
     if (!shader.load("Basic", "./glslfiles/basicTexture.vert", "./glslfiles/basicTexture.frag")) {
         std::cout << "failed to load shader" << std::endl;
     }
 
+    //Red and Blue pre-set colours
     float red[3] = {1, 0, 0};
     float blue[3] = {0, 0, 1};
 
-    ///This part commented is to scale the width of the sprite to match the dimensions of the car.png image.
+    //Scale the height and width of the car
     car.setWidth(5.0f);
     car.setHeight(10.0f);
+
+    //Set the default x and y position of the car
     car.SetXpos(10);
     car.SetYpos(-5);
-    currentAngle = 3*M_PI/2;
+    currentAngle = 3 * M_PI / 2;
 
+    //Setup NPC sprite
     npcCar.setWidth(5.0f);
     npcCar.setHeight(10.0f);
     npcCar.SetXpos(10.0f);
     npcCar.SetYpos(-15.0f);
-    currentAngleNpc = 3*M_PI/2;
+    currentAngleNpc = 3 * M_PI / 2;
 
+    //Setup control image
     arrowKeys.setWidth(50);
     arrowKeys.setHeight(50);
     arrowKeys.init(shader, red, "keys.png");
 
+    //Set the wall heights and widths
     wallBottom.setWidth(250.0f);
     wallBottom.setHeight(5.0f);
     wallRight.setWidth(5.0f);
@@ -925,22 +923,22 @@ void init() {
     wallLeft.setWidth(5.0f);
     wallLeft.setHeight(250.0f);
 
+    //Set inner wall heights and widths
     innerWall_3.setWidth(150);
     innerWall_3.setHeight(90);
-
     innerWall_3.init(shader, red, "roadTexture_26.png");
 
+    //Set inner wall heights and widths
     innerWall_2.setWidth(85);
     innerWall_2.setHeight(325);
-
-
     innerWall_2.init(shader, red, "roadTexture_26.png");
 
+    //Set inner wall heights and widths
     innerWall.setWidth(175);
     innerWall.setHeight(175);
-
     innerWall.init(shader, red, "roadTexture_26.png");
 
+    //Set wall parameters
     wallRight.setXpos(225);
     wallRight.setYpos(100);
     wallBottom.setXpos(100);
@@ -968,6 +966,7 @@ void init() {
     wallLeft_2.setXpos(-25);
     wallLeft_2.setYpos(175);
 
+    //Set track parameters
     trackUp.setWidth(10.0f * (500 / 264.0f));
     trackUp.setHeight(10.0f);
     trackRight.setWidth(10.0f * (500 / 264.0f));
@@ -978,9 +977,10 @@ void init() {
     trackCorner.init(shader, red, "roadTexture_02.png");
 
     start_finish.setWidth(19.0f);
-    start_finish.setHeight(19.0f/2);
+    start_finish.setHeight(19.0f / 2);
     start_finish.init(shader, red, "start_finish.png");
 
+    //Wall initializations
     wallBottom.init(shader, red, "roadTexture_26.png");
     wallRight.init(shader, red, "roadTexture_26.png");
     wallTop.init(shader, red, "roadTexture_26.png");
@@ -996,63 +996,35 @@ void init() {
     trackUp.init(shader, blue, "roadTexture_84.png");
     trackRight.init(shader, blue, "roadTexture_84.png");
 
-
+    //Setup the markers
     marker1.setWidth(20);
     marker1.setHeight(20);
-
     marker2.setWidth(20);
     marker2.setHeight(20);
-
     marker3.setWidth(20);
     marker3.setHeight(20);
-
     marker4.setWidth(20);
     marker4.setHeight(20);
-
     marker5.setWidth(20);
     marker5.setHeight(20);
-
     marker6.setWidth(20);
     marker6.setHeight(20);
-
     marker7.setWidth(20);
     marker7.setHeight(20);
-
     marker8.setWidth(20);
     marker8.setHeight(20);
 
-    marker1.SetXPos(1000);
-    marker1.SetYPos(1000);
-    marker2.SetXPos(0);
-    marker2.SetYPos(0);
-    marker3.SetXPos(0);
-    marker3.SetYPos(0);
-    marker4.SetXPos(0);
-    marker4.SetYPos(0);
-    marker5.SetXPos(0);
-    marker5.SetYPos(0);
-    marker6.SetXPos(0);
-    marker6.SetYPos(0);
-    marker7.SetXPos(0);
-    marker7.SetYPos(0);
-    marker8.SetXPos(0);
-    marker8.SetYPos(0);
-
+    //Setup player markers
     carMarker1.setWidth(40);
     carMarker1.setHeight(40);
-
     carMarker2.setWidth(40);
     carMarker2.setHeight(40);
-
     carMarker3.setWidth(40);
     carMarker3.setHeight(40);
-
     carMarker4.setWidth(40);
     carMarker4.setHeight(40);
-
     carMarker5.setWidth(40);
     carMarker5.setHeight(40);
-
     carMarker6.setWidth(40);
     carMarker6.setHeight(40);
     carMarker7.setWidth(40);
@@ -1060,42 +1032,7 @@ void init() {
     carMarker8.setWidth(40);
     carMarker8.setHeight(40);
 
-
-    carMarker1.SetXPos(0);
-    carMarker1.SetYPos(0);
-    carMarker2.SetXPos(0);
-    carMarker2.SetYPos(0);
-    carMarker3.SetXPos(0);
-    carMarker3.SetYPos(0);
-    carMarker4.SetXPos(0);
-    carMarker4.SetYPos(0);
-    carMarker5.SetXPos(0);
-    carMarker5.SetYPos(0);
-    carMarker6.SetXPos(0);
-    carMarker6.SetYPos(0);
-    carMarker7.SetXPos(0);
-    carMarker7.SetYPos(0);
-    carMarker8.SetXPos(0);
-    carMarker8.SetYPos(0);
-
-    npcMarker1.setWidth(20);
-    npcMarker1.setHeight(20);
-    npcMarker2.setWidth(20);
-    npcMarker2.setHeight(20);
-    npcMarker3.setWidth(20);
-    npcMarker3.setHeight(20);
-    npcMarker4.setWidth(20);
-    npcMarker4.setHeight(20);
-    npcMarker5.setWidth(20);
-    npcMarker5.setHeight(20);
-    npcMarker6.setWidth(20);
-    npcMarker6.setHeight(20);
-    npcMarker7.setWidth(20);
-    npcMarker7.setHeight(20);
-    npcMarker8.setWidth(20);
-    npcMarker8.setHeight(20);
-
-
+    //Initialize NPC markers
     marker1.init(shader, red, "transparent.png");
     marker2.init(shader, red, "transparent.png");
     marker3.init(shader, red, "transparent.png");
@@ -1105,6 +1042,7 @@ void init() {
     marker7.init(shader, red, "transparent.png");
     marker8.init(shader, red, "transparent.png");
 
+    //Initialize player markers
     carMarker1.init(shader, red, "transparent.png");
     carMarker2.init(shader, red, "transparent.png");
     carMarker3.init(shader, red, "transparent.png");
@@ -1114,27 +1052,13 @@ void init() {
     carMarker7.init(shader, red, "transparent.png");
     carMarker8.init(shader, red, "transparent.png");
 
-    npcMarker1.init(shader, red, "roadTexture_26.png");
-    npcMarker2.init(shader, red, "roadTexture_26.png");
-    npcMarker3.init(shader, red, "roadTexture_26.png");
-    npcMarker4.init(shader, red, "roadTexture_26.png");
-    npcMarker5.init(shader, red, "roadTexture_26.png");
-    npcMarker6.init(shader, red, "roadTexture_26.png");
-    npcMarker7.init(shader, red, "roadTexture_26.png");
-    npcMarker8.init(shader, red, "roadTexture_26.png");
-
-    markers[0] = marker1;
-    markers[1] = marker2;
-    markers[2] = marker3;
-    markers[3] = marker4;
-    markers[4] = marker5;
-
-
+    //Initialize font
     font.init("fonts/VT323-Regular.ttf", 35);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+//Special function to poll for arrow keys
 void special(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_LEFT:
@@ -1175,47 +1099,34 @@ void specialUp(int key, int x, int y) {
     }
 }
 
+//Process and player inputs
 void processKeys() {
 
     //Left and right keys control the angle of the car
     if (keyLeft) {
-
         if (!isReversing) {
-
-                currentAngle += TURNING_SPEED / 10;
-
+            currentAngle += TURNING_SPEED / 10;
         } else {
-
-                currentAngle -= TURNING_SPEED / 10;
-
+            currentAngle -= TURNING_SPEED / 10;
         }
     }
 
     if (keyRight) {
-
         if (!isReversing) {
-
-
-                currentAngle -= TURNING_SPEED / 10;
-
+            currentAngle -= TURNING_SPEED / 10;
         } else {
-
-                currentAngle += TURNING_SPEED / 10;
-
+            currentAngle += TURNING_SPEED / 10;
         }
-
     }
-
 
     //Up key controls the acceleration of the car
     if (keyUp) {
 
         //Limit velocity to 2
-        if(velocity > MAX_VELOCITY){
+        if (velocity > MAX_VELOCITY) {
             velocity = MAX_VELOCITY;
             cout << "At Max Velocity" << endl;
-        }
-        else{
+        } else {
             //Increase velocity when holding up key
             velocity += ACCELERATION;
         }
@@ -1230,9 +1141,8 @@ void processKeys() {
             normalAngle = currentAngle;
         }
 
-
-            //  Bottom keyLeft -
-            //.
+        //  Bottom keyLeft -
+        //.
         if (normalAngle < -M_PI) {
             car.IncPos(-sin(normalAngle) * velocity, cos(normalAngle) * velocity);
             orthoYMin -= -cos(normalAngle) * velocity;
@@ -1291,15 +1201,14 @@ void processKeys() {
             orthoXMax -= sin(normalAngle) * velocity;
             ProjectionMatrix = glm::ortho(orthoXMin, orthoXMax, orthoYMin, orthoYMax);
         }
-    }
-    else{
+    } else {
         //Case for if the up key is not being held
-        if(velocity > 0){
-            velocity -= 0.05;
-        }
-        else{
+        if (velocity > 0) {
+            velocity -= ACCELERATION;
+        } else {
             velocity = 0;
         }
+
         isReversing = false;
         float normalAngle;
         if (currentAngle > 2 * M_PI || currentAngle < 2 * M_PI) {
@@ -1372,11 +1281,9 @@ void processKeys() {
 
     if (keyDown) {
 
-        cout << velocity << endl;
-
         isReversing = true;
 
-        velocity += 0.05;
+        velocity += ACCELERATION;
 
 
         float normalAngle;
@@ -1386,8 +1293,8 @@ void processKeys() {
             normalAngle = currentAngle;
         }
 
-            //  Bottom keyLeft -
-            //.
+        //  Bottom keyLeft -
+        //.
         if (normalAngle < -M_PI) {
             car.IncPos(sin(normalAngle) * velocity, -cos(normalAngle) * velocity);
             orthoYMin -= cos(normalAngle) * velocity;
@@ -1452,80 +1359,52 @@ void processKeys() {
 
 void keyFunction(unsigned char key, int x, int y) {
 
-    if(key == 27){
+    if (key == 27) {
         glutLeaveMainLoop();
-    }
-    else if(key == 13){
+    } else if (key == 13) {
         renderMenu = false;
         renderFinish = false;
         resetGame();
         renderCountdown = true;
         countdownCount = 0;
-    }
-    else if(key == 49){
+    } else if (key == 49) {
         currentLevel = 1;
         renderLevel2 = false;
         cout << "Level 1 Selected" << endl;
-    }
-    else if(key == 50){
+    } else if (key == 50) {
         currentLevel = 2;
         renderLevel1 = false;
         cout << "Level 2 Selected" << endl;
-    }
-    else if(key == 109){
+    } else if (key == 109) {
         renderLevel1 = false;
         renderLevel2 = false;
         resetGame();
         renderControlMenu = false;
         renderMenu = true;
-    }
-    else if(key == 99){
+    } else if (key == 99) {
         cout << "Pressed Control Button" << endl;
-        if(renderControlMenu){
+        if (renderControlMenu) {
             renderControlMenu = false;
             renderMenu = true;
-        }
-        else{
+        } else {
             renderControlMenu = true;
         }
-
-    }
-    else{
+    } else {
         cout << "Default" << endl;
     }
-
-    /*switch(key){
-        //Esc
-        case 27:
-            glutLeaveMainLoop();
-        //Carriage Return
-        case 13:
-            renderMenu = false;
-            renderFinish = false;
-            resetGame();
-            renderCountdown = true;
-            countdownCount = 0;
-        case 49:
-            currentLevel = 1;
-            cout << "Level 1 Selected" << endl;
-        case 50:
-            currentLevel = 2;
-            cout << "Level 2 Selected" << endl;
-        default:
-            cout << "Default" << endl;
-    }*/
-
-    cout << "Current Level : " << currentLevel << endl;
 }
 
-void resetGame() {
+void resetGame()
+{
+    //Reset all main game variables
+
     car.SetXpos(10);
     car.SetYpos(-5);
-    currentAngle = 3*M_PI/2;
+    currentAngle = 3 * M_PI / 2;
 
     npcCar.SetXpos(10.0f);
     npcCar.SetYpos(-15.0f);
-    currentAngleNpc = 3*M_PI/2;
+    currentAngleNpc = 3 * M_PI / 2;
 
     orthoYMax = ORTHO * ZOOM;
     orthoYMin = -ORTHO * ZOOM;
@@ -1566,14 +1445,14 @@ void resetGame() {
 
 void idle() {
 
-    cout << "Current Level : " << currentLevel << endl;
+    cout << "Timer : " << (float)timer/60 << endl;
 
-    cout << "Time : " << timer << endl;
+    if (!renderMenu && !renderFinish && !renderCountdown && timer > 0) {
 
-    if(renderMenu == false && renderFinish == false && renderCountdown == false && timer > 0){
         //Process key presses for player
         processKeys();
 
+        //Check collisions for player
         checkPlayerCollisions();
 
         //Process to run npc
@@ -1585,49 +1464,41 @@ void idle() {
 
 void checkPlayerCollisions() {
 
-    if(car.isInCollision(carMarker1.GetOBB())){
+    if (car.isInCollision(carMarker1.GetOBB())) {
         carCollisionCount = 1;
         passed1 = true;
         cout << "Car Marker 1";
-    }
-    else if(car.isInCollision((carMarker2.GetOBB()))){
+    } else if (car.isInCollision((carMarker2.GetOBB()))) {
         carCollisionCount = 2;
         passed2 = true;
         cout << "Car Marker 2";
-    }
-    else if(car.isInCollision((carMarker3.GetOBB()))){
+    } else if (car.isInCollision((carMarker3.GetOBB()))) {
         carCollisionCount = 3;
         passed3 = true;
         cout << "Car Marker 3";
-    }
-    else if(car.isInCollision((carMarker4.GetOBB()))){
+    } else if (car.isInCollision((carMarker4.GetOBB()))) {
         carCollisionCount = 4;
         passed4 = true;
         cout << "Car Marker 4";
-    }
-    else if(car.isInCollision((carMarker5.GetOBB()))){
+    } else if (car.isInCollision((carMarker5.GetOBB()))) {
         carCollisionCount = 5;
         passed5 = true;
-    }
-    else if(car.isInCollision((carMarker6.GetOBB()))){
+    } else if (car.isInCollision((carMarker6.GetOBB()))) {
         carCollisionCount = 6;
         passed6 = true;
-    }
-    else if(car.isInCollision((carMarker7.GetOBB()))){
+    } else if (car.isInCollision((carMarker7.GetOBB()))) {
         carCollisionCount = 7;
         passed7 = true;
-    }
-    else if(car.isInCollision((carMarker8.GetOBB()))){
+    } else if (car.isInCollision((carMarker8.GetOBB()))) {
         carCollisionCount = 8;
         passed8 = true;
-    }
-    else if(car.isInCollision((start_finish.GetOBB()))){
+    } else if (car.isInCollision((start_finish.GetOBB()))) {
         carCollisionCount = 9;
         passedStart = true;
     }
 
-    if(currentLevel == 1){
-        if(carCollisionCount == 9 && passed1 && passed2 && passed3 && passed4 && passedStart){
+    if (currentLevel == 1) {
+        if (carCollisionCount == 9 && passed1 && passed2 && passed3 && passed4 && passedStart) {
             carFinished = true;
             cout << "Car finished" << endl;
             renderFinish = true;
@@ -1639,42 +1510,42 @@ void checkPlayerCollisions() {
 
             float storeTime = timer + 1;
 
-            float newScore = (float)storeTime/60;
+            float newScore = (float) storeTime / 60;
 
-            if(newScore < bestScores2[0] || bestScores2[0] == 0){
-                std::array<float,3> newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+            if (newScore < scoresArray[0] || scoresArray[0] == 0) {
+                std::array<float, 3> newScores{};
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 newScores[0] = newScore;
-                newScores[1] = bestScores2[0];
-                newScores[2] = bestScores2[1];
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[1] = scoresArray[0];
+                newScores[2] = scoresArray[1];
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
-            if(newScore < bestScores2[1] && swapped == false || bestScores2[1] == 0 && swapped == false){
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
-                std::array<float,3> newScores;
-                newScores[0] = bestScores2[0];
+            if (newScore < scoresArray[1] && !swapped || scoresArray[1] == 0 && !swapped) {
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
+                std::array<float, 3> newScores{};
+                newScores[0] = scoresArray[0];
                 newScores[1] = newScore;
-                newScores[2] = bestScores2[1];
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[2] = scoresArray[1];
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
-            if(newScore < bestScores2[2] && swapped == false || bestScores2[2] == 0 && swapped == false){
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
-                std::array<float,3> newScores;
-                newScores[0] = bestScores2[0];
-                newScores[1] = bestScores2[1];
+            if (newScore < scoresArray[2] && !swapped || scoresArray[2] == 0 && !swapped) {
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
+                std::array<float, 3> newScores{};
+                newScores[0] = scoresArray[0];
+                newScores[1] = scoresArray[1];
                 newScores[2] = newScore;
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
         }
-    }
-    else if(currentLevel == 2){
-        if(carCollisionCount == 9 && passed1 && passed2 && passed3 && passed4 && passed5 && passed6 && passed7 && passedStart){
+    } else if (currentLevel == 2) {
+        if (carCollisionCount == 9 && passed1 && passed2 && passed3 && passed4 && passed5 && passed6 && passed7 &&
+            passedStart) {
             carFinished = true;
             cout << "Car finished" << endl;
             renderFinish = true;
@@ -1686,36 +1557,36 @@ void checkPlayerCollisions() {
 
             float storeTime = timer + 1;
 
-            float newScore = (float)storeTime/60;
+            float newScore = (float) storeTime / 60;
 
-            if(newScore < bestScores2[0] || bestScores2[0] == 0){
-                std::array<float,3> newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+            if (newScore < scoresArray[0] || scoresArray[0] == 0) {
+                std::array<float, 3> newScores{};
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 newScores[0] = newScore;
-                newScores[1] = bestScores2[0];
-                newScores[2] = bestScores2[1];
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[1] = scoresArray[0];
+                newScores[2] = scoresArray[1];
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
-            if(newScore < bestScores2[1] && swapped == false || bestScores2[1] == 0 && swapped == false){
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
-                std::array<float,3> newScores;
-                newScores[0] = bestScores2[0];
+            if (newScore < scoresArray[1] && !swapped || scoresArray[1] == 0 && !swapped) {
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
+                std::array<float, 3> newScores{};
+                newScores[0] = scoresArray[0];
                 newScores[1] = newScore;
-                newScores[2] = bestScores2[1];
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                newScores[2] = scoresArray[1];
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
-            if(newScore < bestScores2[2] && swapped == false || bestScores2[2] == 0 && swapped == false){
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
-                std::array<float,3> newScores;
-                newScores[0] = bestScores2[0];
-                newScores[1] = bestScores2[1];
+            if (newScore < scoresArray[2] && !swapped || scoresArray[2] == 0 && !swapped) {
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
+                std::array<float, 3> newScores{};
+                newScores[0] = scoresArray[0];
+                newScores[1] = scoresArray[1];
                 newScores[2] = newScore;
-                bestScores2 = newScores;
-                cout << bestScores2[0] << bestScores2[1] << bestScores2[2] << endl;
+                scoresArray = newScores;
+                cout << scoresArray[0] << scoresArray[1] << scoresArray[2] << endl;
                 swapped = true;
             }
         }
@@ -1726,69 +1597,59 @@ void checkPlayerCollisions() {
 
 void processNpc() {
 
-    if(npcVelocity < MAX_VELOCITY * NPC_ADVANTAGE){
-        npcVelocity += ACCELERATION;
-    }
-    else{
+    if (npcVelocity < MAX_VELOCITY * NPC_ADVANTAGE) {
+        npcVelocity += ACCELERATION *NPC_ADVANTAGE;
+    } else {
         npcVelocity = MAX_VELOCITY * NPC_ADVANTAGE;
         cout << "Npc at Max Velocity" << endl;
     }
 
-    if(npcCar.isInCollision(marker1.GetOBB())){
+    if (npcCar.isInCollision(marker1.GetOBB())) {
         npcCollisionCount = 1;
         npcVelocity = COLLISION_SPEED;
         npcPassed1 = true;
         cout << "Marker 1" << endl;
-    }
-    else if(npcCar.isInCollision((marker2.GetOBB()))){
+    } else if (npcCar.isInCollision((marker2.GetOBB()))) {
         npcCollisionCount = 2;
         npcVelocity = COLLISION_SPEED;
         npcPassed2 = true;
         cout << "Marker 2" << endl;
-    }
-    else if(npcCar.isInCollision((marker3.GetOBB()))){
+    } else if (npcCar.isInCollision((marker3.GetOBB()))) {
         npcCollisionCount = 3;
         npcVelocity = COLLISION_SPEED;
         npcPassed3 = true;
         cout << "Marker 3" << endl;
-    }
-    else if(npcCar.isInCollision((marker4.GetOBB()))){
+    } else if (npcCar.isInCollision((marker4.GetOBB()))) {
         npcCollisionCount = 4;
         npcVelocity = COLLISION_SPEED;
         npcPassed4 = true;
         cout << "Marker 4" << endl;
-    }
-    else if(npcCar.isInCollision((marker5.GetOBB()))){
+    } else if (npcCar.isInCollision((marker5.GetOBB()))) {
         npcCollisionCount = 5;
         npcVelocity = COLLISION_SPEED;
         npcPassed5 = true;
         cout << "Marker 5" << endl;
-    }
-    else if(npcCar.isInCollision((marker6.GetOBB()))){
+    } else if (npcCar.isInCollision((marker6.GetOBB()))) {
         npcCollisionCount = 6;
         npcVelocity = COLLISION_SPEED;
         npcPassed6 = true;
         cout << "Marker 6" << endl;
-    }
-    else if(npcCar.isInCollision((marker7.GetOBB()))){
+    } else if (npcCar.isInCollision((marker7.GetOBB()))) {
         npcCollisionCount = 7;
         npcVelocity = COLLISION_SPEED;
         npcPassed7 = true;
         cout << "Marker 7" << endl;
-    }
-    else if(npcCar.isInCollision((marker8.GetOBB()))){
+    } else if (npcCar.isInCollision((marker8.GetOBB()))) {
         npcCollisionCount = 8;
         npcVelocity = COLLISION_SPEED;
         npcPassed8 = true;
         cout << "Marker 8" << endl;
-    }
-    else if(npcCar.isInCollision((start_finish.GetOBB()))){
+    } else if (npcCar.isInCollision((start_finish.GetOBB()))) {
         npcCollisionCount = 9;
         npcVelocity = COLLISION_SPEED;
         npcPassedStart = true;
         cout << "Marker 9" << endl;
-    }
-    else{
+    } else {
         cout << "No collisions" << endl;
     }
 
@@ -1799,212 +1660,105 @@ void processNpc() {
 
     cout << "Current Level : " << currentLevel << endl;
 
-    if(currentLevel == 1){
-        if(npcCollisionCount == 0){
-            currentAngleNpc = 3*M_PI/2;
+    if (currentLevel == 1) {
+        if (npcCollisionCount == 0) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 1" << endl;
-        }
-        else if(npcCollisionCount == 1){
+        } else if (npcCollisionCount == 1) {
             currentAngleNpc = 0;
             npcCar.IncPos(0, npcVelocity);
             cout << "Section 2" << endl;
-        }
-        else if(npcCollisionCount == 2){
-            currentAngleNpc = M_PI/2;
+        } else if (npcCollisionCount == 2) {
+            currentAngleNpc = M_PI / 2;
             npcCar.IncPos(-npcVelocity, 0);
             cout << "Section 3" << endl;
-        }
-        else if(npcCollisionCount == 3){
+        } else if (npcCollisionCount == 3) {
             currentAngleNpc = M_PI;
             npcCar.IncPos(0, -npcVelocity);
             cout << "Section 4" << endl;
-        }
-        else if(npcCollisionCount == 4){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 4) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 5" << endl;
-        }
-        else if(npcCollisionCount == 5){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 5) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 5" << endl;
-        }
-        else if(npcCollisionCount == 9){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 9) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Start/Finish" << endl;
-        }
-        else{
+        } else {
             cout << "NPC collision count : " << npcCollisionCount << endl;
         }
 
         //Win condition for npc
-        if(npcCollisionCount == 9 && npcPassed1 && npcPassed2 && npcPassed3 && npcPassed4){
-            currentAngleNpc = 3*M_PI/2;
+        if (npcCollisionCount == 9 && npcPassed1 && npcPassed2 && npcPassed3 && npcPassed4) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(0, 0);
             npcCarFinished = true;
             cout << "Npc Finished" << endl;
             renderFinish = true;
         }
-    }
-    else if(currentLevel == 2){
+    } else if (currentLevel == 2) {
 
         cout << "NPC collision count : " << npcCollisionCount << endl;
-        if(npcCollisionCount == 0){
-            currentAngleNpc = 3*M_PI/2;
+        if (npcCollisionCount == 0) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 1" << endl;
-        }
-        else if(npcCollisionCount == 1){
+        } else if (npcCollisionCount == 1) {
             currentAngleNpc = 0;
             npcCar.IncPos(0, npcVelocity);
             cout << "Section 2" << endl;
-        }
-        else if(npcCollisionCount == 2){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 2) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 3" << endl;
-        }
-        else if(npcCollisionCount == 3){
+        } else if (npcCollisionCount == 3) {
             currentAngleNpc = 0;
             npcCar.IncPos(0, npcVelocity);
             cout << "Section 4" << endl;
-        }
-        else if(npcCollisionCount == 4){
-            currentAngleNpc = M_PI/2;
+        } else if (npcCollisionCount == 4) {
+            currentAngleNpc = M_PI / 2;
             npcCar.IncPos(-npcVelocity, 0);
             cout << "Section 5" << endl;
-        }
-        else if(npcCollisionCount == 5){
+        } else if (npcCollisionCount == 5) {
             currentAngleNpc = 0;
             npcCar.IncPos(0, npcVelocity);
             cout << "Section 5" << endl;
-        }
-        else if(npcCollisionCount == 6){
-            currentAngleNpc = M_PI/2;
+        } else if (npcCollisionCount == 6) {
+            currentAngleNpc = M_PI / 2;
             npcCar.IncPos(-npcVelocity, 0);
             cout << "Section 6" << endl;
-        }
-        else if(npcCollisionCount == 7){
+        } else if (npcCollisionCount == 7) {
             currentAngleNpc = M_PI;
             npcCar.IncPos(0, -npcVelocity);
             cout << "Section 7" << endl;
-        }
-        else if(npcCollisionCount == 8){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 8) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
             cout << "Section 8" << endl;
-        }
-        else if(npcCollisionCount == 9){
-            currentAngleNpc = 3*M_PI/2;
+        } else if (npcCollisionCount == 9) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(npcVelocity, 0);
-        }
-        else{
+        } else {
             cout << "NPC collision count : " << npcCollisionCount << endl;
         }
 
         //Win condition for npc
-        if(npcCollisionCount == 9 && npcPassed1 && npcPassed2 && npcPassed3 && npcPassed4 && npcPassed5 && npcPassed6 && npcPassed7 && npcPassed8 && npcPassedStart){
-            currentAngleNpc = 3*M_PI/2;
+        if (npcCollisionCount == 9 && npcPassed1 && npcPassed2 && npcPassed3 && npcPassed4 && npcPassed5 &&
+            npcPassed6 && npcPassed7 && npcPassed8 && npcPassedStart) {
+            currentAngleNpc = 3 * M_PI / 2;
             npcCar.IncPos(0, 0);
             npcCarFinished = true;
             cout << "Npc Finished" << endl;
             renderFinish = true;
         }
     }
-
-
-
-
 }
 
-void moveToMarker() {
-
-    //Define x and y for npc vector
-
-    float normalAngle;
-    if (currentAngle > 2 * M_PI || currentAngle < 2 * M_PI) {
-        normalAngle = remainder(currentAngle, 2 * M_PI);
-    } else {
-        normalAngle = currentAngle;
-    }
-
-
-    cout << "Normal Angle : " << normalAngle << endl;
-
-    float carVectorX = cos(normalAngle);
-    float carVectorY = sin(normalAngle);
-
-    //Define x and y for marker vector
-    float npcVectorX = (car.getXPos() - npcCar.getXPos());
-    float npcVectorY = (car.getYPos() - npcCar.getYPos());
-
-    cout << "Npc Vector : " << npcVectorX << " " << npcVectorY << endl;
-    cout << "Car Vector : " << carVectorX << " " << carVectorY << endl;
-
-    //Dot product of 2 vectors
-    float udotv = (npcVectorX*carVectorX)+(npcVectorY*carVectorX);
-
-    //Absolute values of both vectors
-    float absu = sqrt((npcVectorX*npcVectorX)+(npcVectorY*npcVectorY));
-    float absv = sqrt((carVectorX*carVectorX)+(carVectorY*carVectorY));
-
-    //Find the cosine of the angle between both vectors
-    if(absv*absu == 0){
-        cout << "Divide by 0" << endl;
-    }
-    else{
-        double cosAngle = udotv/(absu*absv);
-        cout << "u.v : " << udotv << endl;
-        cout << "mod(u) : " << absu << endl;
-        cout << "mod(v) : " << absv << endl;
-        npcTargetAngle = acos(cosAngle);
-        cout << "Angle to be targeted : " << acos(cosAngle) << endl;
-    }
-
-
-    //Decide whether to add or subtract the angle
-    if(npcTargetAngle >= currentAngleNpc){
-        cout << "Current Npc angle : " << currentAngleNpc << endl;
-        currentAngleNpc += 0.04;
-        cout << "New Npc angle : " << currentAngleNpc << endl;
-    }
-   /* else if(npcTargetAngle < currentAngleNpc){
-        currentAngleNpc -= 0.04;
-    }
-    else{
-        cout << "Here" << endl;
-    }*/
-
-    //Limit velocity to 2
-    if(npcVelocity > MAX_VELOCITY * NPC_ADVANTAGE){
-        npcVelocity = MAX_VELOCITY * NPC_ADVANTAGE;
-        cout << "Npc at max velocity" << endl;
-    }
-    else{
-        //Increase velocity when holding up key
-        npcVelocity += ACCELERATION;
-    }
-
-    npcIsReversing = false;
-
-
-    cout << currentAngleNpc << endl;
-
-    cout << "Increasing position by : " << cos(currentAngleNpc) * npcVelocity << ", " << sin(currentAngleNpc) * npcVelocity << endl;
-    npcCar.IncPos(cos(currentAngleNpc) * npcVelocity, sin(currentAngleNpc) * npcVelocity);
-
-}
-
-float calculateDistance(float x, float y) {
-    float carX = npcCar.getXPos();
-    float carY = npcCar.getYPos();
-
-    float distance = sqrt(((carX - carY)*(carX - carY)) + ((x - y)*(x - y)));
-
-    return distance;
-}
 /**************** END OPENGL FUNCTIONS *************************/
 
 // FREEGLUT WINDOW SET UP
@@ -2014,7 +1768,9 @@ int main(int argc, char **argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(screenWidth, screenHeight);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("Racer");
+    glutCreateWindow("Go Faster!");
+    glutSetIconTitle("Go Faster!");
+    glutSetWindowTitle("Go Faster!");
 
     glutReshapeFunc(reshape);
 

@@ -44,6 +44,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
+					<Add directory="/usr/include/freetype2"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
@@ -66,6 +67,7 @@
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
+					<Add directory="/usr/include/freetype2"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/x86_64-pc-linux-gnu"/>
 					<Add directory="/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/../../../../include/c++/10.2.0/backward"/>
@@ -94,10 +96,25 @@
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Circle.h">
 			<Option target="Racer"/>
 		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/FreeImage.h">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/FreeType.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/FreeType.h">
+			<Option target="Racer"/>
+		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/ImageLoading.cpp">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/ImageLoading.h">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Marker.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Marker.h">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/OBB.cpp">
@@ -110,6 +127,12 @@
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/Square.h">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Wall.cpp">
+			<Option target="Racer"/>
+		</Unit>
+		<Unit filename="/home/ben/Desktop/Projects/Racer/Wall.h">
 			<Option target="Racer"/>
 		</Unit>
 		<Unit filename="/home/ben/Desktop/Projects/Racer/main.cpp">
