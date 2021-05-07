@@ -2,11 +2,11 @@
 
 Go Faster! is a small 2D racing game implemented in OpenGL/C++ and including the FreeType2 library and FreeImage library
 
-###How to run
+### How to run
 The project was built in CLion by Jetbrains on Arch Linux and can be run and built from that environment with the FreeType2 library and FreeImage library installed
 >Note: The project has not been tested on any other systems or configurations
 
-###How to play
+### How to play
 Once you have the game up and running, you can navigate the menus using a combination of key presses such as:
 > M - Return to menu\
 > C - View controls\
